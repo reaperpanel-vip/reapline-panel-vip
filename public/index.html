@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ReapLine Panel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0a;--panel:#141414;--panel2:#1a1a1a;--input:#101010;--border:rgba(255,255,255,.1);
+  --text:#fff;--muted:rgba(255,255,255,.55);--btn:#f5f5f5;--btn-text:#0a0a0a;--hover:rgba(255,255,255,.06);
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--grid:rgba(255,255,255,.03);
+}
+:root[data-theme="light"]{
+  --bg:#f3f4f6;--panel:#fff;--panel2:#f8f8f9;--input:#fff;--border:rgba(0,0,0,.12);
+  --text:#0a0a0a;--muted:rgba(0,0,0,.55);--btn:#0a0a0a;--btn-text:#fff;--hover:rgba(0,0,0,.05);--grid:rgba(0,0,0,.04);
+}
+html,body{height:100%;max-width:100%;overflow-x:hidden}
+body{background:#0d0d0d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+[hidden]{display:none!important}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ================= LOGIN (original design) ================= */
+#loginView{min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#1a1a1a 0%,#0d0d0d 100%);position:relative}
+.container{width:100%;max-width:400px;padding:20px}
+.login-box{background:rgba(20,20,20,.8);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:40px 30px;backdrop-filter:blur(10px);color:#fff}
+.logo-section{text-align:center;margin-bottom:30px}
+.cloud-logo{width:60px;height:60px;margin:0 auto 15px;display:flex;align-items:center;justify-content:center}
+.r-logo{width:60px;height:60px;font-family:Arial,Helvetica,sans-serif;font-size:50px;font-weight:900;color:#fff;display:flex;align-items:center;justify-content:center;letter-spacing:-2px}
+.panel-title{font-size:24px;font-weight:600;margin-top:10px;letter-spacing:.5px}
+.tab-section{display:flex;justify-content:center;gap:40px;margin-bottom:30px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:15px}
+.tab{cursor:pointer;font-size:16px;font-weight:500;color:rgba(255,255,255,.5);border-bottom:2px solid transparent;padding-bottom:10px;margin-bottom:-25px}
+.tab.active{color:#fff;border-bottom-color:#fff}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:13px;color:rgba(255,255,255,.7);margin-bottom:8px;text-transform:capitalize}
+.form-group input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 15px;color:#fff;font-size:14px;transition:all .3s}
+.form-group input::placeholder{color:rgba(255,255,255,.3)}
+.form-group input:focus{outline:none;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3)}
+.form-group.owner-field{display:none;animation:slideIn .3s ease}
+.form-group.owner-field.show{display:block}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.sign-in-btn{width:100%;background:#fff;color:#000;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;transition:all .3s;margin-top:10px}
+.sign-in-btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(255,255,255,.1)}
+.sign-in-btn:active{transform:translateY(0)}
+.privacy-section{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:15px;margin-top:20px}
+.privacy-title{font-size:13px;font-weight:600;margin-bottom:10px;color:rgba(255,255,255,.9)}
+.privacy-checkbox{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.7)}
+.privacy-checkbox input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:#fff}
+.info-icon{width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.2);border-radius:50%;font-size:12px;cursor:pointer;margin-left:5px}
+.login-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:16px}
+.login-lang{position:absolute;top:16px;right:16px}
+@media(max-width:480px){.login-box{padding:30px 20px}.panel-title{font-size:20px}.tab-section{gap:30px}}
+
+/* ================= APP ================= */
+#appView{min-height:100vh;background:var(--bg);color:var(--text);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:260px;flex:none;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 14px;position:fixed;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);transition:transform .25s ease}
+.sidebar.open{transform:none}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 22px;font-weight:700;font-size:18px}
+.sb-brand .r{width:34px;height:34px;border-radius:10px;background:var(--btn);color:var(--btn-text);display:grid;place-items:center;font-weight:900;font-size:20px}
+.nav{display:flex;flex-direction:column;gap:4px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:none;border:1px solid transparent;cursor:pointer;color:var(--muted);text-align:left;font-weight:500;width:100%}
+.nav-item:hover{background:var(--hover);color:var(--text)}
+.nav-item.active{background:var(--hover);border-color:var(--border);color:var(--text)}
+.nav-item.owner-nav{color:#fbbf24}
+.nav-item.owner-nav.active{border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+.nav-sep{height:1px;background:var(--border);margin:8px 6px}
+.sb-foot{border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:10px}
+.user-chip{display:flex;align-items:center;gap:10px;padding:0 6px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--panel2);border:1px solid var(--border);display:grid;place-items:center;font-weight:700;text-transform:uppercase}
+.user-chip small{display:block;color:var(--muted);font-size:12px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:30;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.show{opacity:1;pointer-events:auto}
+.main{flex:1;min-width:0;padding:20px 16px 60px;max-width:1200px;width:100%;margin:0 auto}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.icon-btn{height:44px;min-width:44px;padding:0 14px;border-radius:12px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;color:var(--text)}
+.icon-btn:hover{background:var(--hover)}
+.spacer{flex:1}
+.owner-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(245,158,11,.06));border:1px solid rgba(251,191,36,.45);color:#fbbf24;font-weight:600;font-size:14px;white-space:nowrap}
+.page-title{font-size:30px;font-weight:700;letter-spacing:-.3px}
+.page-sub{color:var(--muted);margin:4px 0 18px;font-size:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:14px 18px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;font-weight:600;color:var(--text);transition:transform .15s,background .15s}
+.btn:hover{background:var(--hover)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--btn);color:var(--btn-text);border-color:transparent}
+.btn.primary:hover{opacity:.92}
+.btn.danger{color:#fca5a5;border-color:rgba(239,68,68,.35)}
+.btn.sm{padding:9px 12px;border-radius:10px;font-size:13px}
+.btn.block{width:100%}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:18px 0}
+.stat{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:16px}
+.stat::after{content:"";position:absolute;right:-18px;top:-18px;width:70px;height:70px;border-radius:50%;background:var(--c);opacity:.12}
+.stat .lbl{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.stat .num{font-size:34px;font-weight:700;margin-top:10px}
+.row-link{display:flex;align-items:center;gap:12px;width:100%;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;font-weight:600;font-size:17px;text-align:left}
+.row-link .chev{margin-left:auto;transition:transform .2s}
+.row-link.open .chev{transform:rotate(180deg)}
+.all-links{background:var(--panel);border:1px solid var(--border);border-radius:16px;margin-top:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.link-line{display:flex;align-items:center;gap:8px;background:var(--input);border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:13px}
+.link-line b{flex:none;max-width:35%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link-line code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+.search-box{display:flex;align-items:center;height:56px;border-radius:16px;border:1px solid var(--border);background:var(--panel);padding:0 18px;gap:10px;flex:none;transition:all .25s;cursor:pointer;color:var(--muted)}
+.search-box input{display:none;background:none;border:none;outline:none;flex:1;min-width:0}
+.search-box.open{flex:1 1 100%;cursor:text}
+.search-box.open input{display:block}
+.toolbar .btn,.toolbar select{height:56px}
+.toolbar .btn{flex:1 1 100%}
+select,.field input,.field textarea{width:100%;background:var(--input);border:1px solid var(--border);border-radius:14px;padding:14px 16px;outline:none}
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:42px;cursor:pointer}
+select option{background:#151515;color:#fff}
+.toolbar select{flex:1 1 100%}
+.field input:focus,.field textarea:focus,select:focus{border-color:var(--muted)}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted);opacity:.6}
+.grid-cards{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:6px}
+.card{min-width:0;max-width:100%;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card-head{display:flex;align-items:flex-start;gap:10px}
+.card-head h3{font-size:18px;word-break:break-word}
+.card-head p{color:var(--muted);font-size:13px;margin-top:2px;word-break:break-word}
+.badge{margin-left:auto;flex:none;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;border:1px solid var(--c);color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent)}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meta div{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--muted)}
+.meta b{display:block;color:var(--text);font-size:15px;margin-top:2px}
+.card .note{font-size:13px;color:var(--muted);border-left:2px solid var(--border);padding-left:10px}
+.card .ann{font-size:13px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:8px 10px;border-radius:10px}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.actions .btn{flex:1 1 auto}
+.empty{text-align:center;color:var(--muted);padding:70px 20px;display:flex;flex-direction:column;align-items:center;gap:20px}
+.empty svg{width:64px;height:64px;stroke-width:1.5;opacity:.7}
+.banner{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.35);color:#93c5fd;border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:14px}
+.section{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px;margin-top:16px}
+.section h2{font-size:18px;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.section>p{color:var(--muted);font-size:13px;margin-bottom:14px}
+.owner-page .section{border-color:rgba(251,191,36,.25)}
+.inline-form{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
+.list{display:flex;flex-direction:column;gap:8px}
+.list-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+.list-item .grow{flex:1;min-width:140px}
+.list-item small{color:var(--muted);display:block}
+.hint{color:var(--muted);font-size:13px;margin-top:6px}
+
+#ownerPill{display:flex;align-items:center;gap:8px;min-width:0}
+.key-btn{font-size:20px;padding:0;width:44px;flex:none}
+.code-list{background:var(--panel2);border:1px solid var(--border);border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
+.code-row{display:flex;align-items:center;gap:10px;background:var(--input);border:1px solid var(--border);border-radius:14px;padding:10px}
+.code-n{flex:none;width:34px;height:34px;border-radius:10px;background:rgba(59,130,246,.18);color:#60a5fa;display:grid;place-items:center;font-weight:700;font-size:15px}
+.code-flag{flex:none;font-size:24px;line-height:1}
+.code-flag.dim{opacity:.35}
+.code-name{flex:1;min-width:0;background:none;border:none;border-bottom:1px dashed transparent;outline:none;font-size:17px;font-weight:500;padding:4px 2px;color:var(--text)}
+.code-name:hover{border-bottom-color:var(--border)}
+.code-name:focus{border-bottom-color:var(--muted)}
+.flag-btn{flex:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;font-size:20px;display:grid;place-items:center}
+.flag-btn:hover{background:var(--hover)}
+.tag-manual{flex:none;padding:4px 10px;border-radius:8px;background:rgba(168,85,247,.2);color:#c084fc;font-size:13px;font-weight:700}
+.code-row .btn.sm{padding:8px 10px;flex:none}
+.flag-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-height:60vh;overflow:auto}
+.flag-opt{font-size:26px;padding:8px 0;border-radius:12px;border:1px solid var(--border);background:var(--panel2);cursor:pointer}
+.flag-opt:hover{background:var(--hover)}
+.flag-opt.none{grid-column:1/-1;font-size:15px;padding:12px}
+@media(max-width:480px){.owner-pill{padding:8px 10px;font-size:13px}.icon-btn{min-width:40px;padding:0 10px}.key-btn{width:40px}.topbar{gap:8px}}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal.show{opacity:1;pointer-events:auto}
+.sheet{background:#161616;color:#fff;width:100%;max-height:92vh;overflow:auto;border:1px solid var(--border);border-radius:24px 24px 0 0;padding:22px 20px 26px;transform:translateY(30px);transition:transform .25s}
+:root[data-theme="light"] .sheet{background:#fff;color:#0a0a0a}
+.modal.show .sheet{transform:none}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.sheet-head h2{font-size:22px}
+.field{margin-bottom:18px}
+.field>label{display:block;font-size:14px;font-weight:600;letter-spacing:.3px;color:var(--muted);margin-bottom:8px}
+.field textarea{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;min-height:240px;resize:vertical;line-height:1.5;white-space:pre;overflow:auto}
+.seg{display:flex;background:var(--input);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:12px}
+.seg button{flex:1;padding:11px;border:none;border-radius:10px;background:none;cursor:pointer;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--btn);color:var(--btn-text)}
+.cfg-stats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px}
+.chip{padding:3px 9px;border-radius:999px;background:var(--panel2);border:1px solid var(--border);color:var(--muted)}
+.chip.ok{color:var(--green);border-color:rgba(34,197,94,.4)}
+.chip.bad{color:var(--red);border-color:rgba(239,68,68,.4)}
+.group-pick{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow:auto}
+.group-pick label{display:flex;align-items:center;gap:12px;background:var(--input);border:1px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer}
+.group-pick input{width:18px;height:18px;accent-color:var(--btn);flex:none}
+.group-pick small{margin-left:auto;color:var(--muted)}
+.form-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--btn);color:var(--btn-text);padding:12px 20px;border-radius:12px;font-weight:600;z-index:100;opacity:0;pointer-events:none;transition:all .25s;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(min-width:640px){
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .grid-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .toolbar .btn,.toolbar select{flex:1 1 0}
+  .search-box.open{flex:1 1 100%}
+  .inline-form{grid-template-columns:1fr 1fr 110px 150px auto;align-items:center}
+  .inline-form.no-role{grid-template-columns:1fr 1fr 110px auto}
+  .inline-form.bulk-form{grid-template-columns:1fr 1fr auto}
+  .modal{align-items:center}
+  .sheet{max-width:620px;border-radius:24px;max-height:90vh}
+}
+@media(min-width:960px){
+  .sidebar{transform:none}
+  .main{margin-left:260px;max-width:none;padding:28px 36px 60px}
+  .layout{display:block}
+  #hamburger{display:none}
+  .overlay{display:none}
+  .grid-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+/* compact */
+.main{padding:14px 12px 48px}
+.page-title{font-size:24px}.page-sub{font-size:14px;margin:2px 0 12px}
+.btn{padding:10px 14px;border-radius:12px;font-size:14px}.btn.sm{padding:7px 10px;font-size:12px}
+.btn.block{padding:12px!important;font-size:15px!important}
+.stats{gap:8px;margin:12px 0}.stat{padding:11px;border-radius:14px}.stat .lbl{font-size:12px}.stat .num{font-size:26px;margin-top:6px}
+.row-link{padding:12px;font-size:15px;border-radius:14px}
+.grid-cards{gap:10px}.card{padding:13px;gap:9px;border-radius:14px}
+.card-head h3{font-size:16px}.card-head p{font-size:12px}
+.meta{gap:6px}.meta div{padding:7px 9px;font-size:12px;border-radius:10px}.meta b{font-size:13px}
+.link-line{font-size:12px;padding:7px 9px}
+.sb-brand{font-size:16px}
+
+/* subscription card (new look) */
+.sc{min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.sc.off{opacity:.85}
+.sc-ico{display:flex;gap:8px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
+.sc-ib{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--panel2);color:var(--text);display:grid;place-items:center;cursor:pointer;padding:0}
+.sc-ib:hover{background:var(--hover)}
+.sc-ib.danger{color:#fca5a5}
+.sc-name{align-self:flex-start;max-width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--panel2);font-size:18px;font-weight:600;word-break:break-word}
+.sc-st{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:600}
+.sc-st i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.sc-st span{color:var(--c)}
+.sc-date{color:var(--muted);font-size:15px;margin-top:4px}
+.sc-cfg{font-size:18px;font-weight:600;margin-bottom:8px}
+.sc-chips{display:flex;gap:6px;flex-wrap:wrap}
+.sc-chip{font-size:12px;font-weight:700;padding:4px 9px;border-radius:7px;color:var(--c);background:color-mix(in srgb,var(--c) 18%,transparent)}
+.sc-tg{width:46px;height:26px;border-radius:999px;border:1px solid var(--border);background:var(--panel2);position:relative;cursor:pointer;padding:0;flex:none}
+.sc-tg i{position:absolute;left:3px;top:2px;width:20px;height:20px;border-radius:50%;background:#888;transition:all .2s}
+.sc-tg.on{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.5)}
+.sc-tg.on i{left:23px;background:var(--green)}
+.sc-lim .lh{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);margin-bottom:8px}
+.sc-bar{height:8px;border-radius:999px;background:var(--hover);overflow:hidden}
+.sc-bar b{display:block;height:100%;border-radius:999px;background:var(--green)}
+.sc-bar.inf b{width:100%;background:var(--border)}
+.sc-cl{display:flex;flex-direction:column;gap:6px}
+.sc-cl div{font-size:13px;background:var(--input);border:1px solid var(--border);border-radius:10px;padding:8px 10px;word-break:break-word}
+.sc-cl small{color:var(--muted);margin-right:6px;font-weight:700;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginView">
+  <button class="icon-btn login-lang" type="button" data-act="lang" style="background:rgba(255,255,255,.06);color:#fff">EN</button>
+  <div class="container">
+    <div class="login-box">
+      <div class="logo-section">
+        <div class="cloud-logo"><div class="r-logo">R</div></div>
+        <h1 class="panel-title">ReapLine Panel</h1>
+      </div>
+      <div class="tab-section"><div class="tab active" data-i18n="login">Login</div></div>
+      <form id="loginForm" autocomplete="off">
+        <div id="loginErr" class="login-error" hidden></div>
+        <div class="form-group">
+          <label for="username" data-i18n="username">Username</label>
+          <input type="text" id="username" data-i18n-ph="enterUser" placeholder="Enter username" required autocapitalize="off">
+        </div>
+        <div class="form-group">
+          <label for="password" data-i18n="password">Password</label>
+          <input type="password" id="password" data-i18n-ph="enterPass" placeholder="Enter password" required>
+        </div>
+        <div class="form-group owner-field" id="ownerField">
+          <label for="owner" data-i18n="owner">Owner</label>
+          <input type="text" id="owner" data-i18n-ph="enterOwner" placeholder="Enter owner" autocapitalize="off">
+        </div>
+        <button type="submit" class="sign-in-btn" data-i18n="signIn">Sign in</button>
+        <div class="privacy-section">
+          <div class="privacy-title" data-i18n="privacyReq">Privacy Policy required</div>
+          <div class="privacy-checkbox">
+            <input type="checkbox" id="privacy" required>
+            <label for="privacy" style="margin:0;cursor:pointer;text-transform:none;font-size:13px;color:rgba(255,255,255,.7)"><span data-i18n="privacyAccept">I have read and accept the Privacy Policy.</span> <span class="info-icon" title="Privacy Policy">i</span></label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="appView" hidden>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-brand"><span class="r">R</span> ReapLine Panel</div>
+      <nav class="nav" id="nav"></nav>
+      <div class="sb-foot">
+        <div class="user-chip"><div class="avatar" id="avatar">?</div><div><b id="uName">-</b><small id="uRole">-</small></div></div>
+        <button class="btn block sm" data-act="logout"><svg class="i" id="icLogout"></svg><span data-i18n="logout">Log out</span></button>
+      </div>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+
+    <main class="main">
+      <div class="topbar">
+        <button class="icon-btn" id="hamburger" data-act="menu" aria-label="menu"><svg class="i" data-ic="menu"></svg></button>
+        <div id="ownerPill"></div>
+        <div class="spacer"></div>
+        <button class="icon-btn" data-act="theme" id="themeBtn" aria-label="theme"></button>
+        <button class="icon-btn" data-act="lang" id="langBtn">EN</button>
+      </div>
+
+      <div id="pages">
+        <!-- Subscriptions -->
+        <section id="page-subs" hidden>
+          <h1 class="page-title" data-i18n="subsTitle">Subscriptions</h1>
+          <p class="page-sub" data-i18n="subsSub">Manage your subscription nodes</p>
+          <div id="globalBanner"></div>
+          <button class="btn primary block" data-act="new-sub" style="padding:16px;font-size:17px"><svg class="i" data-ic="plus"></svg><span data-i18n="newSub">New subscription</span></button>
+          <div class="stats" id="stats"></div>
+          <button class="row-link" id="allLinksBtn" data-act="toggle-all"><svg class="i" data-ic="link"></svg><span id="allLinksLbl">All subscriptions (0)</span><svg class="i chev" data-ic="chev"></svg></button>
+          <div class="all-links" id="allLinks" hidden></div>
+          <div class="toolbar">
+            <div class="search-box" id="searchBox" data-act="search-open"><svg class="i" data-ic="search"></svg><input id="searchInput" data-i18n-ph="search" placeholder="Search..."></div>
+            <button class="btn" data-act="refresh"><svg class="i" data-ic="refresh"></svg><span data-i18n="update">Update</span></button>
+            <select id="statusFilter"></select>
+          </div>
+          <div class="grid-cards" id="subList"></div>
+        </section>
+
+        <!-- Groups -->
+        <section id="page-groups" hidden>
+          <h1 class="page-title" data-i18n="groupsTitle">Config groups</h1>
+          <p class="page-sub" data-i18n="groupsSub">Reusable config sets you can attach to subscriptions</p>
+          <button class="btn primary block" data-act="new-group" style="padding:16px;font-size:17px"><svg class="i" data-ic="plus"></svg><span data-i18n="newGroup">New group</span></button>
+          <div class="grid-cards" id="groupList" style="margin-top:18px"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Subscription modal -->
+  <div class="modal" id="subModal">
+    <div class="sheet">
+      <div class="sheet-head"><h2 id="subModalTitle">Create new subscription</h2><button class="icon-btn" style="border:none;background:none" data-act="close-modal"><svg class="i" data-ic="x"></svg></button></div>
+      <div id="formErr" class="form-err" hidden></div>
+      <div class="field"><label data-i18n="subName">Subscription name</label><input id="f_name" placeholder="e.g. client-vip" autocapitalize="off"></div>
+      <div class="field"><label data-i18n="profileTitle">Profile title</label><input id="f_title" placeholder="e.g. VIP subscription profile"></div>
+      <div class="field"><label data-i18n="webUrl">Web page URL</label><input id="f_web" placeholder="https://example.com" inputmode="url"></div>
+      <div class="field"><label data-i18n="supportUrl">Support URL</label><input id="f_support" placeholder="https://t.me/support" inputmode="url"></div>
+      <div class="field"><label data-i18n="gbLimit">GB Limit</label><select id="f_gb"></select>
+        <input id="f_gb_custom" type="number" min="0.1" step="any" inputmode="decimal" data-i18n-ph="gbCustomPh" placeholder="Enter GB (e.g. 40)" style="margin-top:10px" hidden></div>
+      <div class="field"><label data-i18n="limit">Device Limit</label><select id="f_limit"></select></div>
+      <div class="field"><label data-i18n="duration">Duration / Expiration</label><select id="f_duration"></select></div>
+      <div class="field"><label data-i18n="interval">Update interval</label><select id="f_interval"></select></div>
+      <div class="field"><label data-i18n="announcement">Announcement</label><input id="f_announce" data-i18n-ph="annPh" placeholder="Important update message..."></div>
+      <div class="field"><label><span data-i18n="note">Note</span> <span data-i18n="optional">(Optional)</span></label><input id="f_note" data-i18n-ph="notePh" placeholder="Additional notes..."></div>
+      <div class="field" id="codeNamesField" hidden>
+        <label data-i18n="codeNames">VPN code names (you can edit)</label>
+        <p class="hint" data-i18n="codeNamesHint" style="margin:-2px 0 10px">Codes are hidden. Only names are shown. Flag will be moved to the beginning of the name.</p>
+        <div class="code-list" id="codeList"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="extraConfigs">Extra Configs (optional)</label>
+        <div class="seg" id="modeSeg"><button type="button" data-mode="manual" class="on" data-i18n="writeManually">Write manually</button><button type="button" data-mode="groups" data-i18n="pickGroups">Pick from groups</button></div>
+        <div id="modeManual"><textarea id="f_configs" spellcheck="false" placeholder="vless://...&#10;vmess://...&#10;trojan://...&#10;ss://...&#10;hysteria://..."></textarea></div>
+        <div id="modeGroups" hidden><div class="group-pick" id="groupPick"></div></div>
+        <div class="cfg-stats" id="cfgStats"></div>
+      </div>
+      <button class="btn primary block" id="saveSubBtn" data-act="save-sub" style="padding:16px;font-size:17px" data-i18n="saveSub">Save subscription</button>
+    </div>
+  </div>
+
+  <!-- Group modal -->
+  <div class="modal" id="groupModal">
+    <div class="sheet">
+      <div class="sheet-head"><h2 id="groupModalTitle">New group</h2><button class="icon-btn" style="border:none;background:none" data-act="close-modal"><svg class="i" data-ic="x"></svg></button></div>
+      <div id="groupErr" class="form-err" hidden></div>
+      <div class="field"><label data-i18n="groupName">Group name</label><input id="g_name" placeholder="e.g. germany-nodes"></div>
+      <div class="field"><label>Configs</label><textarea id="g_configs" spellcheck="false" placeholder="vless://...&#10;vmess://..."></textarea><div class="cfg-stats" id="gCfgStats"></div></div>
+      <button class="btn primary block" data-act="save-group" style="padding:16px;font-size:17px" data-i18n="saveGroup">Save group</button>
+    </div>
+  </div>
+
+  <!-- Shared VPN codes (owner only button) -->
+  <div class="modal" id="keysModal">
+    <div class="sheet">
+      <div class="sheet-head"><h2>🔑 <span data-i18n="keysTitle">VPN codes</span></h2><button class="icon-btn" style="border:none;background:none" data-act="close-modal"><svg class="i" data-ic="x"></svg></button></div>
+      <p class="hint" data-i18n="keysHint" style="margin:-8px 0 14px">Codes you add here appear for every user. They only see the names; the codes stay hidden.</p>
+      <div class="field"><textarea id="k_codes" spellcheck="false" style="min-height:140px" placeholder="vless://...&#10;vmess://...&#10;trojan://...&#10;ss://...&#10;hysteria://..."></textarea></div>
+      <button class="btn primary block" data-act="add-codes" data-i18n="addCodes">Add codes</button>
+      <div class="field" style="margin:20px 0 8px"><label id="k_title">Shared codes (0)</label><div class="code-list" id="keysList"></div></div>
+    </div>
+  </div>
+
+  <!-- Flag picker -->
+  <div class="modal" id="flagModal" style="z-index:80">
+    <div class="sheet" style="max-width:420px">
+      <div class="sheet-head"><h2 data-i18n="pickFlag">Pick a flag</h2><button class="icon-btn" style="border:none;background:none" data-act="close-flag"><svg class="i" data-ic="x"></svg></button></div>
+      <div class="flag-grid" id="flagGrid"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<!-- Owner page: this block is only injected into the DOM after a successful owner login -->
+<template id="tpl-owner">
+  <section id="page-owner" class="owner-page" hidden>
+    <h1 class="page-title" style="display:flex;align-items:center;gap:12px;color:#fbbf24"><svg class="i" data-ic="crown" style="width:28px;height:28px"></svg><span data-i18n="adminTitle">Admin area</span></h1>
+    <p class="page-sub" data-i18n="adminSub">Only visible to the owner. Manage users, announcements and data.</p>
+    <div class="stats" id="o_stats"></div>
+
+    <div class="section">
+      <h2><svg class="i" data-ic="users"></svg><span data-i18n="panelUsers">Panel users</span></h2>
+      <p data-i18n="panelUsersHint">Create accounts for people who sign in with username and password. They only see their own subscriptions.</p>
+      <div class="inline-form field">
+        <input id="o_newUser" data-i18n-ph="username" placeholder="Username" autocapitalize="off">
+        <input id="o_newPass" data-i18n-ph="password" placeholder="Password">
+        <input id="o_newLimit" type="number" min="0" max="100000" value="5" data-i18n-ph="subLimitPh" placeholder="Sub limit (0 = unlimited)">
+        <button class="btn primary" data-act="add-user"><svg class="i" data-ic="plus"></svg><span data-i18n="addUser">Add user</span></button>
+      </div>
+      <div class="list" id="o_users"></div>
+    </div>
+
+    <div class="section">
+      <h2><svg class="i" data-ic="megaphone"></svg><span data-i18n="globalAnn">Global announcement</span></h2>
+      <p data-i18n="globalAnnHint">Shown at the top of the Subscriptions page for every user.</p>
+      <div class="field"><input id="o_announce" data-i18n-ph="annPh" placeholder="Important update message..."></div>
+      <div class="field"><label data-i18n="baseUrl">Subscription base URL</label><input id="o_baseUrl" placeholder="https://example.com"></div>
+      <div class="field" id="o_syncField"><label data-i18n="syncKey">Server sync key (SYNC_KEY)</label><input id="o_syncKey" type="password" autocomplete="off" autocapitalize="off" placeholder="SYNC_KEY"></div>
+      <button class="btn primary" data-act="save-settings" data-i18n="save">Save</button>
+      <button class="btn" id="o_syncBtn" data-act="sync-now" style="margin-left:8px" data-i18n="syncNow">Sync now</button>
+    </div>
+
+    <div class="section" id="o_bulk">
+      <h2><svg class="i" data-ic="users"></svg><span data-i18n="bulkUsers">Quick users</span></h2>
+      <p data-i18n="bulkHint">Creates user accounts (role: user) with random names. Only visible to the owner. Change the number and press the button to add or remove accounts.</p>
+      <div class="inline-form field bulk-form">
+        <input id="o_bulkCount" type="number" min="0" max="100" value="5" data-i18n-ph="userCount" placeholder="User count">
+        <input id="o_bulkLimit" type="number" min="0" max="100000" value="5" data-i18n-ph="subLimitPh" placeholder="Sub limit (0 = unlimited)">
+        <button class="btn primary" data-act="bulk-apply"><svg class="i" data-ic="users"></svg><span data-i18n="bulkApply">Set user count</span></button>
+      </div>
+      <div class="list" id="o_bulkList"></div>
+    </div>
+
+    <div class="section" id="o_backup">
+      <h2><svg class="i" data-ic="database"></svg><span data-i18n="backup">Backup &amp; data</span></h2>
+      <p data-i18n="backupHint">Data is stored in this browser. Export regularly.</p>
+      <div class="actions">
+        <button class="btn" data-act="export"><svg class="i" data-ic="download"></svg><span data-i18n="exportData">Export JSON</span></button>
+        <button class="btn" data-act="copy-users"><svg class="i" data-ic="copy"></svg><span data-i18n="copyUsers">Copy users code</span></button>
+        <button class="btn" data-act="import"><svg class="i" data-ic="upload"></svg><span data-i18n="importData">Import JSON</span></button>
+        <button class="btn danger" data-act="wipe"><svg class="i" data-ic="trash"></svg><span data-i18n="wipe">Wipe all data</span></button>
+      </div>
+      <input type="file" id="o_file" accept="application/json" hidden>
+    </div>
+  </section>
+</template>
+
+<script>
+/* ===================== CONFIG ===================== */
+const ADMIN_USER = 'reaperowner12';
+const ADMIN_PASS = 'ownerreaper12';
+const OWNER_NAMES = ['atajan', 'atajan12'];   // accepted owner names (case-insensitive)
+const OWNER_DISPLAY = 'Atajan';
+const SPECIAL = { username: 'ozumrepr', password: 'atajanxrepr', extra: 'ozum' };   // hidden from admins, only the owner manages it
+const EXPIRING_DAYS = 3;
+const DAY = 864e5;
+
+/* ===================== HELPERS ===================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const newToken = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const rid = (n = 16) => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, n);
+
+const ICONS = {
+  menu:'<path d="M4 6h16M4 12h10M4 18h16"/>', plus:'<path d="M12 5v14M5 12h14"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>',
+  power:'<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>', chev:'<path d="m6 9 6 6 6-6"/>',
+  monitor:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  crown:'<path d="M2 20h20M4 17 2 6l6 5 4-8 4 8 6-5-2 11z"/>',
+  users:'<circle cx="9" cy="7" r="4"/><path d="M2 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/><path d="M16 3.1a4 4 0 0 1 0 7.8M22 21v-2a5 5 0 0 0-3.5-4.8"/>',
+  layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  download:'<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>', upload:'<path d="M12 21V9M7 14l5-5 5 5M5 3h14"/>',
+  megaphone:'<path d="m3 11 18-6v14L3 13z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  share:'<path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>',
+  key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3"/>'
+};
+const ic = n => `<svg class="i" viewBox="0 0 24 24">${ICONS[n] || ''}</svg>`;
+function paintIcons(root = document) {
+  $$('svg[data-ic]', root).forEach(s => { s.setAttribute('viewBox', '0 0 24 24'); s.innerHTML = ICONS[s.dataset.ic] || ''; });
+}
+
+/* ===================== i18n ===================== */
+const I18N = {
+  en: {
+    login:'Login', username:'Username', password:'Password', owner:'Owner', enterUser:'Enter username', enterPass:'Enter password', enterOwner:'Enter owner',
+    signIn:'Sign in', privacyReq:'Privacy Policy required', privacyAccept:'I have read and accept the Privacy Policy.',
+    privacyAlert:'Please accept the Privacy Policy', ownerNeeded:'Owner name is required for this account', ownerWrong:'Wrong owner name',
+    badLogin:'Wrong username or password', userDisabled:'This account is disabled',
+    navAdmin:'Admin', navSubs:'Subscriptions', navGroups:'Config groups', logout:'Log out', roleAdmin:'Admin', roleUser:'User',
+    subsTitle:'Subscriptions', subsSub:'Manage your subscription nodes', newSub:'New subscription',
+    totalSubs:'Total Subscriptions', active:'Active', expiringSoon:'Expiring Soon', totalConfigs:'Total Configs',
+    allSubs:'All subscriptions ({n})', copyAll:'Copy all links', search:'Search...', update:'Update', updated:'Updated',
+    allStatus:'All status', st_active:'Active', st_expiring:'Expiring soon', st_expired:'Expired', st_disabled:'StoppedSubs', st_userOff:'Disabled',
+    emptySubs:'No subscriptions yet. Create your first subscription to get started.', emptyFilter:'No subscriptions match your filter.',
+    expires:'Expires', noExpiry:'Never', daysLeft:'{n} days left', dayLeft:'1 day left', expiredAgo:'Expired {n}d ago', expiredToday:'Expired today',
+    devices:'Devices', noLimitShort:'Unlimited', cfgs:'Configs', every:'Refresh', createdBy:'By', copyLink:'Copy link', copied:'Copied', edit:'Edit',
+    disable:'Disable', enable:'Enable', del:'Delete', confirmDel:'Delete this item? This cannot be undone.',
+    createSub:'Create new subscription', editSub:'Edit subscription', subName:'Subscription name', profileTitle:'Profile title', webUrl:'Web page URL', supportUrl:'Support URL',
+    limit:'Device Limit', duration:'Duration / Expiration', interval:'Update interval', announcement:'Announcement', note:'Note', optional:'(Optional)',
+    annPh:'Important update message...', notePh:'Additional notes...', writeManually:'Write manually', pickGroups:'Pick from groups',
+    saveSub:'Save subscription', saveChanges:'Save changes', keepCurrent:'Keep current expiration',
+    noGroups:'No groups yet.', goGroups:'Create a group first', valid:'{n} valid', invalid:'{n} invalid', saved:'Saved',
+    errName:'Name must be 2-40 characters: letters, numbers, - or _', errNameDup:'A subscription with this name already exists',
+    errUrl:'Please enter valid URLs (https://...)', errConfigs:'Add at least one valid config',
+    noLimit:'No limit', gbLimit:'GB Limit', custom:'Custom', nGb:'{n} GB', gbCustomPh:'Enter GB (e.g. 40)', errGb:'Enter a valid GB amount', traffic:'Traffic', nDevices:'{n} device(s)', nDays:'{n} Days', unlimited:'Unlimited', nMin:'{n} Minutes', nHour:'{n} Hour', nHours:'{n} Hours',
+    groupsTitle:'Config groups', groupsSub:'Reusable config sets you can attach to subscriptions', newGroup:'New group', editGroup:'Edit group',
+    groupName:'Group name', saveGroup:'Save group', emptyGroups:'No groups yet. Create one to reuse configs across subscriptions.', errGroup:'Group name and at least one valid config are required',
+    usedBy:'Used by {n}',
+    adminTitle:'Admin area', adminSub:'Only visible to the owner. Manage users, announcements and data.',
+    ownerTitle:'Owner area', ownerSub:'Only visible to the owner. Manage users, announcements and data.', navOwner:'Owner', roleOwner:'Owner', ownerBadge:'Owner: {n}',
+    totalUsers:'Panel users', allSystemSubs:'All subscriptions', expiredSubs:'Expired',
+    panelUsers:'Panel users', panelUsersHint:'Create accounts that sign in with username and password. Users only see their own subscriptions. Only the owner manages users.', roleAdminOpt:'Admin', errSelf:'You cannot do this to your own account', makeAdmin:'Make admin', lockedAdmin:'Only the owner can manage admins', hiddenFromAdmins:'Hidden from admins',
+    codeNames:'VPN code names (you can edit)', codeNamesHint:'Codes are hidden. Only names are shown. Flag will be moved to the beginning of the name.', extraConfigs:'Extra Configs (optional)',
+    tagManual:'Manual', tagGroup:'Group', keysTitle:'VPN codes', keysHint:'Codes you add here appear for every user. They only see the names; the codes stay hidden.',
+    addCodes:'Add codes', sharedCodes:'Shared codes ({n})', pickFlag:'Pick a flag', noFlag:'No flag', codesAdded:'{n} code(s) added', codesNone:'No new valid codes found', copyCode:'Copy code', makeUser:'Make user',
+    addUser:'Add user', noUsers:'No users yet. Only accounts you add here can sign in.', resetPass:'Reset password', newPassPrompt:'New password for {u}:',
+    errUser:'Username and password are required (username must be unique)', userAdded:'User added', syncKey:'Server sync key (SYNC_KEY)', syncNow:'Sync now', syncOk:'Synced ({n})', syncFail:'Sync failed: {e}', syncNoKey:'Enter the sync key first', subLimitPh:'Sub limit (0 = unlimited)', setLimit:'Limit', limitPrompt:'Subscription limit for {u} (0 = unlimited):', limitSaved:'Limit saved', errSubLimit:'Subscription limit reached ({n})', bulkUsers:'Quick users', bulkHint:'Creates user accounts (role: user) with random names. Only visible to the owner. Change the number and press the button to add or remove accounts.', userCount:'User count', bulkApply:'Set user count', bulkShrink:'This will delete {n} account(s). Continue?', bulkDone:'User count updated', copyCred:'Copy login',
+    globalAnn:'Global announcement', globalAnnHint:'Shown at the top of the Subscriptions page for every user.', baseUrl:'Subscription base URL', save:'Save',
+    backup:'Backup & data', backupHint:'Data is stored in this browser. Export regularly.',
+    exportData:'Export JSON', copyUsers:'Copy users code', importData:'Import JSON', wipe:'Wipe all data', confirmWipe:'Delete ALL panel data (subscriptions, groups, users, logs)?', importOk:'Imported', importBad:'Invalid backup file',
+    adminBadge:'Admin: {n}'
+  },
+  tr: {
+    login:'Giriş', username:'Kullanıcı adı', password:'Şifre', owner:'Owner', enterUser:'Kullanıcı adı girin', enterPass:'Şifre girin', enterOwner:'Owner adını girin',
+    signIn:'Giriş yap', privacyReq:'Gizlilik Politikası gerekli', privacyAccept:'Gizlilik Politikasını okudum ve kabul ediyorum.',
+    privacyAlert:'Lütfen Gizlilik Politikasını kabul edin', ownerNeeded:'Bu hesap için owner adı gerekli', ownerWrong:'Owner adı yanlış',
+    badLogin:'Kullanıcı adı veya şifre yanlış', userDisabled:'Bu hesap devre dışı',
+    navAdmin:'Admin', navSubs:'Abonelikler', navGroups:'Config grupları', logout:'Çıkış yap', roleAdmin:'Admin', roleUser:'Kullanıcı',
+    subsTitle:'Abonelikler', subsSub:'Abonelik nodelarını yönet', newSub:'Yeni abonelik',
+    totalSubs:'Toplam Abonelik', active:'Aktif', expiringSoon:'Yakında Bitecek', totalConfigs:'Toplam Config',
+    allSubs:'Tüm abonelikler ({n})', copyAll:'Tüm linkleri kopyala', search:'Ara...', update:'Güncelle', updated:'Güncellendi',
+    allStatus:'Tüm durumlar', st_active:'Aktif', st_expiring:'Yakında bitecek', st_expired:'Süresi dolmuş', st_disabled:'StoppedSubs', st_userOff:'Devre dışı',
+    emptySubs:'Henüz abonelik yok. Başlamak için ilk aboneliğini oluştur.', emptyFilter:'Filtreye uyan abonelik yok.',
+    expires:'Bitiş', noExpiry:'Süresiz', daysLeft:'{n} gün kaldı', dayLeft:'1 gün kaldı', expiredAgo:'{n} gün önce bitti', expiredToday:'Bugün bitti',
+    devices:'Cihaz', noLimitShort:'Sınırsız', cfgs:'Config', every:'Yenileme', createdBy:'Ekleyen', copyLink:'Linki kopyala', copied:'Kopyalandı', edit:'Düzenle',
+    disable:'Devre dışı bırak', enable:'Etkinleştir', del:'Sil', confirmDel:'Silinsin mi? Bu işlem geri alınamaz.',
+    createSub:'Yeni abonelik oluştur', editSub:'Aboneliği düzenle', subName:'Abonelik adı', profileTitle:'Profil başlığı', webUrl:'Web sayfası URL', supportUrl:'Destek URL',
+    limit:'Device Limit', duration:'Süre / Bitiş', interval:'Güncelleme aralığı', announcement:'Duyuru', note:'Not', optional:'(İsteğe bağlı)',
+    annPh:'Önemli güncelleme mesajı...', notePh:'Ek notlar...', writeManually:'Elle yaz', pickGroups:'Gruplardan seç',
+    saveSub:'Aboneliği kaydet', saveChanges:'Değişiklikleri kaydet', keepCurrent:'Mevcut bitiş süresini koru',
+    noGroups:'Henüz grup yok.', goGroups:'Önce bir grup oluştur', valid:'{n} geçerli', invalid:'{n} geçersiz', saved:'Kaydedildi',
+    errName:'İsim 2-40 karakter olmalı: harf, rakam, - veya _', errNameDup:'Bu isimde bir abonelik zaten var',
+    errUrl:'Geçerli URL girin (https://...)', errConfigs:'En az bir geçerli config ekleyin',
+    noLimit:'Limit yok', gbLimit:'GB Limit', custom:'Özel', nGb:'{n} GB', gbCustomPh:'GB girin (örn. 40)', errGb:'Geçerli bir GB değeri girin', traffic:'Trafik', nDevices:'{n} cihaz', nDays:'{n} Gün', unlimited:'Süresiz', nMin:'{n} Dakika', nHour:'{n} Saat', nHours:'{n} Saat',
+    groupsTitle:'Config grupları', groupsSub:'Aboneliklere eklenebilen tekrar kullanılır config setleri', newGroup:'Yeni grup', editGroup:'Grubu düzenle',
+    groupName:'Grup adı', saveGroup:'Grubu kaydet', emptyGroups:'Henüz grup yok. Configleri tekrar kullanmak için bir grup oluştur.', errGroup:'Grup adı ve en az bir geçerli config gerekli',
+    usedBy:'{n} abonelikte',
+    adminTitle:'Admin alanı', adminSub:'Sadece owner görebilir. Kullanıcıları, duyuruları ve verileri yönet.',
+    ownerTitle:'Owner alanı', ownerSub:'Sadece owner görebilir. Kullanıcıları, duyuruları ve verileri yönet.', navOwner:'Owner', roleOwner:'Owner', ownerBadge:'Owner: {n}',
+    totalUsers:'Panel kullanıcıları', allSystemSubs:'Tüm abonelikler', expiredSubs:'Süresi dolmuş',
+    panelUsers:'Panel kullanıcıları', panelUsersHint:'Kullanıcı adı ve şifre ile giriş yapan hesaplar oluştur. Kullanıcılar sadece kendi aboneliklerini görür. Kullanıcıları sadece owner yönetir.', roleAdminOpt:'Admin', errSelf:'Bu işlemi kendi hesabına yapamazsın', makeAdmin:'Admin yap', lockedAdmin:'Adminleri sadece owner yönetebilir', hiddenFromAdmins:'Adminlerden gizli',
+    codeNames:'VPN kod isimleri (düzenleyebilirsin)', codeNamesHint:'Kodlar gizli. Sadece isimler gösterilir. Bayrak ismin başına taşınır.', extraConfigs:'Ek Configler (isteğe bağlı)',
+    tagManual:'Manuel', tagGroup:'Grup', keysTitle:'VPN kodları', keysHint:'Buraya eklediğin kodlar herkeste görünür. Kullanıcılar sadece isimleri görür; kodlar gizli kalır.',
+    addCodes:'Kodları ekle', sharedCodes:'Ortak kodlar ({n})', pickFlag:'Bayrak seç', noFlag:'Bayraksız', codesAdded:'{n} kod eklendi', codesNone:'Yeni geçerli kod bulunamadı', copyCode:'Kodu kopyala', makeUser:'Kullanıcı yap',
+    addUser:'Kullanıcı ekle', noUsers:'Henüz kullanıcı yok. Sadece buradan eklediğin hesaplar giriş yapabilir.', resetPass:'Şifreyi sıfırla', newPassPrompt:'{u} için yeni şifre:',
+    errUser:'Kullanıcı adı ve şifre gerekli (kullanıcı adı benzersiz olmalı)', userAdded:'Kullanıcı eklendi', syncKey:'Sunucu senkron anahtarı (SYNC_KEY)', syncNow:'Şimdi senkronla', syncOk:'Senkronlandı ({n})', syncFail:'Senkron başarısız: {e}', syncNoKey:'Önce senkron anahtarını gir', subLimitPh:'Abonelik limiti (0 = sınırsız)', setLimit:'Limit', limitPrompt:'{u} için abonelik limiti (0 = sınırsız):', limitSaved:'Limit kaydedildi', errSubLimit:'Abonelik limitine ulaşıldı ({n})', bulkUsers:'Hızlı kullanıcılar', bulkHint:'Rastgele isimli kullanıcı hesapları (rol: user) oluşturur. Sadece owner görür. Sayıyı değiştirip butona basarak hesap ekle ya da sil.', userCount:'User Sayısı', bulkApply:'User sayısını ayarla', bulkShrink:'{n} hesap silinecek. Devam edilsin mi?', bulkDone:'User sayısı güncellendi', copyCred:'Girişi kopyala',
+    globalAnn:'Genel duyuru', globalAnnHint:'Her kullanıcının Abonelikler sayfasının üstünde gösterilir.', baseUrl:'Abonelik ana URL', save:'Kaydet',
+    backup:'Yedek ve veri', backupHint:'Veriler bu tarayıcıda saklanır. Düzenli olarak dışa aktar.',
+    exportData:'JSON dışa aktar', copyUsers:'Kullanıcı kodunu kopyala', importData:'JSON içe aktar', wipe:'Tüm veriyi sil', confirmWipe:'TÜM panel verisi silinsin mi (abonelikler, gruplar, kullanıcılar, loglar)?', importOk:'İçe aktarıldı', importBad:'Geçersiz yedek dosyası',
+    adminBadge:'Admin: {n}'
+  }
+};
+let lang = (() => { try { return localStorage.getItem('reaper:lang') || 'en'; } catch (e) { return 'en'; } })();
+const OWNER_VARIANT = { adminTitle: 'ownerTitle', adminSub: 'ownerSub', navAdmin: 'navOwner', roleAdmin: 'roleOwner', adminBadge: 'ownerBadge' };
+const t = (k, v = {}) => {
+  if (typeof session !== 'undefined' && session && session.role === 'owner' && OWNER_VARIANT[k]) k = OWNER_VARIANT[k];
+  return (I18N[lang][k] ?? I18N.en[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? '');
+};
+
+/* ===================== STORAGE ===================== */
+const KEY = 'reaper:data:v1', SKEY = 'reaper:session';
+const defaultBase = () => (/^https?:/.test(location.protocol) ? location.origin : 'https://medical.loveslife.biz');
+const blank = () => ({ users: [], subs: [], groups: [], shared: [], deleted: [], announcement: '', baseUrl: defaultBase() });
+function loadDb() { try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { return blank(); } }
+let db = loadDb(); delete db.log;
+/* eski 20 karakterlik hex token'lar yeni formata geçer; eski link çalışmaya devam eder (legacyToken) */
+db.subs.forEach(x => { if (/^[0-9a-f]{20}$/.test(x.token) && !x.legacyToken) { x.legacyToken = x.token; x.token = newToken(); } });
+db.users.forEach(u => { if (u.role === 'admin') u.role = 'user'; });
+const SYNC_KEY_LS = 'reaper:synckey', SYNC_MAP_LS = 'reaper:syncmap';
+const getSyncKey = () => { try { return localStorage.getItem(SYNC_KEY_LS) || ''; } catch (e) { return ''; } };
+let syncTimer = 0, syncBusy = false, syncAgain = false;
+function scheduleSync() { if (!getSyncKey()) return; clearTimeout(syncTimer); syncTimer = setTimeout(() => pushSync(false), 800); }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} scheduleSync(); };
+let session = null;
+/* Users listed here work on EVERY device/domain (data in localStorage is per device).
+   Owner area > Backup > "Copy users code", then paste the result over the line below and redeploy. */
+const SEED_USERS = [{"username":"baky123","password":"baky123","role":"user"}];
+function ensureSpecial() {
+  SEED_USERS.forEach(s => {
+    if (!s || !s.username || !s.password) return;
+    const f = db.users.find(x => x.username === s.username);
+    const role = 'user';
+    const lim = Math.max(0, parseInt(s.limit) || 0);
+    if (!f) db.users.push({ id: rid(8), username: s.username, password: s.password, role: s.hidden ? 'user' : role, disabled: false, subLimit: lim, ...(s.hidden ? { protected: true, auto: true } : {}) });
+    else if (!f.protected || s.hidden) { f.password = s.password; f.role = s.hidden ? 'user' : role; f.subLimit = lim; }
+  });
+  const u = db.users.find(x => x.username === SPECIAL.username);
+  if (!u) {
+    if (!db.specialInit) db.users.push({ id: rid(8), username: SPECIAL.username, password: SPECIAL.password, role: 'user', disabled: false, protected: true, extra: SPECIAL.extra });
+  } else if (!u.protected) {
+    Object.assign(u, { password: SPECIAL.password, protected: true, extra: SPECIAL.extra });
+  }
+  db.specialInit = true; save();
+}
+ensureSpecial();
+let theme = (() => { try { return localStorage.getItem('reaper:theme') || 'system'; } catch (e) { return 'system'; } })();
+const isOwnerRole = () => !!session && session.role === 'owner';
+const isAdmin = () => !!session && session.role === 'owner';   // admin rolü yok: sadece owner yönetir
+
+/* ===================== DOMAIN ===================== */
+const PROTO = /^(vless|vmess|trojan|ss|hysteria2?|hy2):\/\/\S+$/i;
+const parseCfg = txt => { const lines = String(txt || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean); return { valid: [...new Set(lines.filter(l => PROTO.test(l)))], invalid: lines.filter(l => !PROTO.test(l)) }; };
+const hiddenOwners = () => new Set(db.users.filter(u => u.protected).map(u => u.username));
+const canSee = o => isOwnerRole() ? true : isAdmin() ? !hiddenOwners().has(o) : o === session.user;
+const visibleGroups = () => db.groups.filter(g => canSee(g.owner));
+const visibleSubs = () => db.subs.filter(s => canSee(s.owner));
+const visibleUsers = () => db.users.filter(u => isOwnerRole() || !u.protected);
+function subConfigs(s) { return [...new Set([...db.shared.map(x => x.code), ...extraConfigs(s)])]; }
+function subConfigsWithDesc(s) { const cfgs = subConfigs(s); return cfgs.map(cfg => ({ config: cfg, description: 'ReapLine' })); }
+function extraConfigs(s) {
+  if (s.mode === 'groups') {
+    const all = (s.groupIds || []).flatMap(id => { const g = db.groups.find(x => x.id === id); return g ? parseCfg(g.configs).valid : []; });
+    return [...new Set(all)];
+  }
+  return parseCfg(s.configs).valid;
+}
+function statusOf(s) {
+  if (s.disabled) return 'disabled';
+  if (s.expiresAt) {
+    const left = s.expiresAt - Date.now();
+    if (left <= 0) return 'expired';
+    if (left <= EXPIRING_DAYS * DAY) return 'expiring';
+  }
+  return 'active';
+}
+const STATUS_COLOR = { active: 'var(--green)', expiring: 'var(--amber)', expired: 'var(--red)', disabled: '#888' };
+const PUBLIC_BASE = 'https://reapline-panel-vip.netlify.app';
+const subLink = s => PUBLIC_BASE + '/sub/' + s.token;
+
+/* ===================== SERVER SYNC (Netlify function serves /sub/<token>) ===================== */
+function linkWithName(code, display) {
+  try {
+    if (/^vmess:\/\//i.test(code)) {
+      const b = code.slice(8).split('#')[0].replace(/-/g, '+').replace(/_/g, '/');
+      const j = JSON.parse(decodeURIComponent(escape(atob(b)))); j.ps = display;
+      return 'vmess://' + btoa(unescape(encodeURIComponent(JSON.stringify(j))));
+    }
+  } catch (e) {}
+  const i = code.indexOf('#');
+  return (i > -1 ? code.slice(0, i) : code) + '#' + encodeURIComponent(display);
+}
+/* ---- ReapLine: sabit isim öneki + silinmiş abonelik yer tutucusu ---- */
+const NAME_PREFIX = 'ReapLine - ';
+const DELETED_TITLE = 'ReapLine - DeletedSubs';
+const DEL_SS = { method: 'chacha20-ietf-poly1305', host: '0.0.0.0', port: 3169, pass: 'https://social.linkm.me/users/reaper_baba' };
+const brandTitle = txt => NAME_PREFIX + String(txt || '').replace(/^\s*ReapLine\s*-\s*/i, '').trim();
+const STOPPED_TITLE = 'ReapLine - StoppedSubs';
+function phLink(title) {
+  const ui = btoa(DEL_SS.method + ':' + DEL_SS.pass).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return 'ss://' + ui + '@' + DEL_SS.host + ':' + DEL_SS.port + '#' + encodeURIComponent(title);
+}
+const delSsLink = () => phLink(DELETED_TITLE);
+/* dondurulan abonelik: ayni token, 'ReapLine - StoppedSubs' yer tutucusu olarak yayinlanir */
+function compileStopped(s) {
+  return { token: s.token, name: 'StoppedSubs', title: STOPPED_TITLE, web: '', support: '', announcement: '', interval: 1, gbLimit: 0, expiresAt: 0, disabled: false, links: [phLink(STOPPED_TITLE)] };
+}
+function compileDeleted(token) {
+  return { token, name: 'DeletedSubs', title: DELETED_TITLE, web: '', support: '', announcement: '', interval: 1, gbLimit: 0, expiresAt: 0, disabled: false, links: [delSsLink()] };
+}
+function compileSub(s) {
+  const links = subConfigs(s).map((c, i) => {
+    const info = (s.names && s.names[c]) || defaultInfo(c, i);
+    return linkWithName(c, ((info.flag ? info.flag + ' ' : '') + (info.name || ('Config ' + (i + 1)))).trim());
+  });
+  return { token: s.token, name: s.name, title: brandTitle(s.title || s.name), web: s.web || '', support: s.support || '', announcement: s.announcement || '',
+    interval: s.interval || 1, gbLimit: s.gbLimit || 0, expiresAt: s.expiresAt || 0, disabled: !!s.disabled, links };
+}
+const hash32 = str => { let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return h + ':' + str.length; };
+async function syncPost(payload) {
+  const r = await fetch(db.baseUrl.replace(/\/+$/, '') + '/api/sync', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-sync-key': getSyncKey() }, body: JSON.stringify(payload) });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+async function pushSync(force) {
+  if (!getSyncKey()) return { ok: false, skipped: true };
+  if (syncBusy) { syncAgain = true; return { ok: false, busy: true }; }
+  syncBusy = true;
+  try {
+    let saved = {}; try { saved = JSON.parse(localStorage.getItem(SYNC_MAP_LS) || '{}'); } catch (e) {}
+    const prev = (!force && saved.base === db.baseUrl && saved.h) || {}, cur = {}, upsert = [];
+    db.subs.forEach(s => {
+      const c = s.disabled ? compileStopped(s) : compileSub(s), h = hash32(JSON.stringify(c)); cur[s.token] = h; if (prev[s.token] !== h) upsert.push(c);
+      if (s.legacyToken) { const c2 = Object.assign({}, c, { token: s.legacyToken }), h2 = hash32(JSON.stringify(c2)); cur[s.legacyToken] = h2; if (prev[s.legacyToken] !== h2) upsert.push(c2); }
+    });
+    /* silinen abonelikler: sunucudan silme, 'ReapLine - DeletedSubs' (ss 0.0.0.0:3169) olarak yayınla */
+    const live = new Set(db.subs.flatMap(s => [s.token, s.legacyToken].filter(Boolean)));
+    db.deleted = [...new Set([...(db.deleted || []), ...Object.keys(prev).filter(tk => !(tk in cur))])].filter(tk => !live.has(tk));
+    db.deleted.forEach(tk => { const c = compileDeleted(tk), h = hash32(JSON.stringify(c)); cur[tk] = h; if (prev[tk] !== h) upsert.push(c); });
+    try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {}
+    const remove = [];
+    let n = 0;
+    if (!upsert.length && !remove.length && !force) return { ok: true, n: 0 };
+    if (!upsert.length && !remove.length) await syncPost({ ping: true });
+    for (let i = 0; i < upsert.length; i += 40) { await syncPost({ upsert: upsert.slice(i, i + 40), remove: i === 0 ? remove : [] }); n += Math.min(40, upsert.length - i); }
+    if (!upsert.length && remove.length) await syncPost({ remove });
+    try { localStorage.setItem(SYNC_MAP_LS, JSON.stringify({ base: db.baseUrl, h: cur })); } catch (e) {}
+    return { ok: true, n };
+  } catch (e) { return { ok: false, error: String(e && e.message || e) }; }
+  finally { syncBusy = false; if (syncAgain) { syncAgain = false; scheduleSync(); } }
+}
+function expiryText(s) {
+  if (!s.expiresAt) return t('noExpiry');
+  const d = Math.ceil((s.expiresAt - Date.now()) / DAY);
+  if (d > 1) return t('daysLeft', { n: d });
+  if (d === 1) return t('dayLeft');
+  const ago = Math.floor((Date.now() - s.expiresAt) / DAY);
+  return ago >= 1 ? t('expiredAgo', { n: ago }) : t('expiredToday');
+}
+const okUrl = u => !u || /^https?:\/\/[^\s.]+\.\S+$/i.test(u);
+
+/* ===================== UI BASICS ===================== */
+let toastTimer;
+function toast(msg) { const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 1800); }
+async function copyText(txt) {
+  try { await navigator.clipboard.writeText(txt); }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = 0; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (_) {} ta.remove(); }
+  toast(t('copied'));
+}
+function applyTheme() {
+  const dark = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  const b = $('#themeBtn'); if (b) b.innerHTML = ic(theme === 'system' ? 'monitor' : theme === 'dark' ? 'moon' : 'sun');
+}
+function fillSelects() {
+  const set = (id, opts) => { const el = $(id); if (!el) return; const cur = el.value; el.innerHTML = opts.map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join(''); if ([...el.options].some(o => o.value === cur)) el.value = cur; };
+  set('#o_role', [['user', t('roleUser')], ['admin', t('roleAdminOpt')]]);
+  set('#f_gb', [['0', t('noLimit')], ...[1, 5, 10, 15, 20, 30, 50, 75, 100].map(n => [n, t('nGb', { n })]), ['custom', t('custom')]]);
+  set('#f_limit', [['0', t('noLimit')], ...[1, 2, 3, 5, 10, 20].map(n => [n, t('nDevices', { n })])]);
+  const durs = [...[7, 15, 30, 60, 90, 180, 365].map(n => [n, t('nDays', { n })]), ['0', t('unlimited')]];
+  set('#f_duration', editingId ? [['keep', t('keepCurrent')], ...durs] : durs);
+  set('#f_interval', [['0.5', t('nMin', { n: 30 })], ['1', t('nHour', { n: 1 })], ...[3, 6, 12, 24].map(n => [n, t('nHours', { n })])]);
+  set('#statusFilter', [['all', t('allStatus')], ['active', t('st_active')], ['expiring', t('st_expiring')], ['expired', t('st_expired')], ['disabled', t('st_disabled')]]);
+  if (!editingId && $('#f_duration') && !$('#subModal').classList.contains('show')) $('#f_duration').value = '30';
+}
+function applyI18n() {
+  document.documentElement.lang = lang;
+  $$('[data-i18n]').forEach(e => e.textContent = t(e.dataset.i18n));
+  $$('[data-i18n-ph]').forEach(e => e.placeholder = t(e.dataset.i18nPh));
+  $$('[data-act="lang"]').forEach(b => b.textContent = lang.toUpperCase());
+  fillSelects();
+  if (session) { buildNav(); renderAll(); }
+}
+
+/* ===================== LOGIN ===================== */
+function loginErr(msg) { const e = $('#loginErr'); e.textContent = msg; e.hidden = !msg; }
+function checkOwnerCredentials() {
+  const un = $('#username').value, pw = $('#password').value;
+  const ok = (un === ADMIN_USER && pw === ADMIN_PASS) || db.users.some(x => x.extra && !x.disabled && x.username === un && x.password === pw);
+  $('#ownerField').classList.toggle('show', ok);
+}
+$('#username').addEventListener('input', checkOwnerCredentials);
+$('#password').addEventListener('input', checkOwnerCredentials);
+$('#loginForm').addEventListener('submit', e => {
+  e.preventDefault(); loginErr('');
+  const u = $('#username').value.trim(), p = $('#password').value, o = $('#owner').value.trim();
+  if (!$('#privacy').checked) return loginErr(t('privacyAlert'));
+  if (u.toLowerCase() === ADMIN_USER) {
+    if (p !== ADMIN_PASS) return loginErr(t('badLogin'));
+    if (!o) return loginErr(t('ownerNeeded'));
+    if (!OWNER_NAMES.includes(o.toLowerCase())) return loginErr(t('ownerWrong'));
+    return startSession({ user: OWNER_DISPLAY, role: 'owner' });
+  }
+  // Only accounts created by the owner/admin can sign in
+  const f = db.users.find(x => x.username === u && x.password === p);
+  if (!f) return loginErr(t('badLogin'));
+  if (f.disabled) return loginErr(t('userDisabled'));
+  if (f.extra) {
+    if (!o) return loginErr(t('ownerNeeded'));
+    if (o.toLowerCase() !== f.extra.toLowerCase()) return loginErr(t('ownerWrong'));
+  }
+  return startSession({ user: f.username, display: f.extra || undefined, role: 'user' });
+});
+
+function startSession(s, silent) {
+  session = s;
+  try { sessionStorage.setItem(SKEY, JSON.stringify(s)); } catch (e) {}
+  $('#loginView').hidden = true; $('#appView').hidden = false;
+  $('#loginForm').reset(); checkOwnerCredentials();
+  // Owner-only section is created ONLY for the owner
+  $('#page-owner')?.remove();
+  if (isAdmin()) {
+    $('#pages').prepend($('#tpl-owner').content.cloneNode(true));
+    if (!isOwnerRole()) { $('#o_backup').remove(); $('#o_bulk').remove(); $('#o_syncField').remove(); $('#o_syncBtn').remove(); }
+    $('.inline-form', $('#page-owner')).classList.add('no-role');   // only the owner can create admins / use backup tools
+    paintIcons($('#page-owner'));
+  }
+  $('#icLogout').innerHTML = ICONS.logout; $('#icLogout').setAttribute('viewBox', '0 0 24 24');
+  const shown = s.display || s.user;
+  $('#uName').textContent = shown; $('#avatar').textContent = shown[0] || '?';
+  $('#uRole').textContent = isAdmin() ? t('roleAdmin') : t('roleUser');
+  $('#ownerPill').innerHTML = isAdmin() ? `<span class="owner-pill">${ic('crown')} ${esc(t('adminBadge', { n: session.display || session.user }))}</span>` + (isOwnerRole() ? `<button class="icon-btn key-btn" data-act="open-keys" title="VPN codes" aria-label="VPN codes">🔑</button>` : '') : '';
+  applyI18n(); applyTheme(); paintIcons();
+  showPage(isAdmin() ? 'owner' : 'subs');
+}
+function logout() {
+  try { sessionStorage.removeItem(SKEY); } catch (e) {}
+  session = null; $('#page-owner')?.remove();
+  $('#appView').hidden = true; $('#loginView').hidden = false; closeMenu();
+}
+
+/* ===================== NAV ===================== */
+let page = 'subs';
+function buildNav() {
+  const items = [];
+  if (isAdmin()) items.push(['owner', 'crown', t('navAdmin'), 'owner-nav'], ['sep']);
+  items.push(['subs', 'link', t('navSubs')], ['groups', 'layers', t('navGroups')]);
+  $('#nav').innerHTML = items.map(([id, icon, label, cls]) => id === 'sep' ? '<div class="nav-sep"></div>' :
+    `<button class="nav-item ${cls || ''} ${page === id ? 'active' : ''}" data-act="nav" data-id="${id}">${ic(icon)}<span>${esc(label)}</span></button>`).join('');
+}
+function showPage(p) {
+  if (p === 'owner' && !isAdmin()) p = 'subs';
+  page = p;
+  ['owner', 'subs', 'groups'].forEach(id => { const el = $('#page-' + id); if (el) el.hidden = id !== p; });
+  buildNav(); renderAll(); closeMenu(); window.scrollTo(0, 0);
+}
+const openMenu = () => { $('#sidebar').classList.add('open'); $('#overlay').classList.add('show'); };
+const closeMenu = () => { $('#sidebar').classList.remove('open'); $('#overlay').classList.remove('show'); };
+
+/* ===================== RENDER ===================== */
+function renderAll() {
+  if (!session) return;
+  if (page === 'subs') renderSubs();
+  if (page === 'groups') renderGroups();
+  if (page === 'owner' && isAdmin()) renderOwner();
+}
+function statCard(color, label, num) { return `<div class="stat" style="--c:${color}"><div class="lbl"><span class="dot"></span>${esc(label)}</div><div class="num">${num}</div></div>`; }
+
+const openCfg = new Set();
+const PROTO_LABEL = { vless: 'VLESS', vmess: 'VMess', trojan: 'Trojan', ss: 'SS', hysteria2: 'Hysteria2', hysteria: 'Hysteria', tuic: 'TUIC', wireguard: 'WireGuard' };
+const PROTO_COLOR = { vless: '#3b82f6', vmess: '#8b5cf6', trojan: '#ef4444', ss: '#f59e0b', hysteria2: '#06b6d4', hysteria: '#06b6d4', tuic: '#ec4899', wireguard: '#22c55e' };
+function protoOf(code) {
+  const m = String(code).match(/^([a-z0-9]+):\/\//i); let k = m ? m[1].toLowerCase() : 'other';
+  if (k === 'hy2') k = 'hysteria2'; if (k === 'shadowsocks') k = 'ss'; return k;
+}
+function leftShort(s) {
+  const ms = s.expiresAt - Date.now(); if (ms <= 0) return '0';
+  const d = Math.floor(ms / DAY), h = Math.floor(ms % DAY / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+  return d >= 1 ? d + 'd' : h >= 1 ? h + 'h' : Math.max(1, m) + 'm';
+}
+const fmtDate = ts => { const d = new Date(ts), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; };
+function renderSubs() {
+  const all = visibleSubs();
+  const st = all.map(statusOf);
+  $('#globalBanner').innerHTML = db.announcement ? `<div class="banner">📢 ${esc(db.announcement)}</div>` : '';
+  $('#stats').innerHTML =
+    statCard('#3b82f6', t('totalSubs'), all.length) +
+    statCard('#22c55e', t('active'), st.filter(x => x === 'active' || x === 'expiring').length) +
+    statCard('#f59e0b', t('expiringSoon'), st.filter(x => x === 'expiring').length) +
+    statCard('#a855f7', t('totalConfigs'), all.reduce((n, s) => n + subConfigs(s).length, 0));
+  $('#allLinksLbl').textContent = t('allSubs', { n: all.length });
+  $('#allLinks').innerHTML = all.length
+    ? all.map(s => `<div class="link-line"><b>${esc(s.name)}</b><code>${esc(subLink(s))}</code><button class="btn sm" data-act="copy-link" data-id="${s.id}">${ic('copy')}</button></div>`).join('') +
+      `<button class="btn sm" data-act="copy-all">${ic('copy')} ${esc(t('copyAll'))}</button>`
+    : `<div class="hint" style="text-align:center">${esc(t('emptySubs'))}</div>`;
+
+  const q = $('#searchInput').value.trim().toLowerCase(), f = $('#statusFilter').value || 'all';
+  const list = all.filter(s => (f === 'all' || statusOf(s) === f) && (!q || [s.name, s.title, s.note, s.owner].join(' ').toLowerCase().includes(q)));
+  const el = $('#subList');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty" style="grid-column:1/-1">${ic('link')}<div>${esc(all.length ? t('emptyFilter') : t('emptySubs'))}</div></div>`;
+    return;
+  }
+  el.innerHTML = list.map(s => {
+    const status = statusOf(s), cfgs = subConfigs(s), n = cfgs.length, c = STATUS_COLOR[status];
+    const cnt = {}; cfgs.forEach(x => { const k = protoOf(x); cnt[k] = (cnt[k] || 0) + 1; });
+    const chips = Object.keys(cnt).map(k => `<span class="sc-chip" style="--c:${PROTO_COLOR[k] || '#9ca3af'}">${cnt[k]} ${esc(PROTO_LABEL[k] || k.toUpperCase())}</span>`).join('');
+    const lbl = status === 'disabled' ? t('st_disabled') : status === 'expired' ? t('st_expired') : (s.expiresAt ? leftShort(s) : '∞');
+    const used = Math.max(0, +s.usedGb || 0), pct = s.gbLimit ? Math.min(100, used / s.gbLimit * 100) : 0;
+    const lim = s.gbLimit ? `${+used.toFixed(2)} / ${s.gbLimit} GB` : t('noLimitShort');
+    const dev = s.limit ? ' · ' + t('nDevices', { n: s.limit }) : '';
+    return `<div class="sc ${s.disabled ? 'off' : ''}">
+      <div class="sc-ico">
+        <button class="sc-ib" data-act="copy-link" data-id="${s.id}" title="${esc(t('copyLink'))}">${ic('copy')}</button>
+        <button class="sc-ib" data-act="copy-cfgs" data-id="${s.id}" title="Configs">${ic('grid')}</button>
+        <button class="sc-ib" data-act="copy-sub-desc" data-id="${s.id}" title="Copy with ReapLine Description">${ic('copy')}</button>
+        <button class="sc-ib" data-act="share-sub" data-id="${s.id}">${ic('share')}</button>
+        <button class="sc-ib" data-act="edit-sub" data-id="${s.id}" title="${esc(t('edit'))}">${ic('edit')}</button>
+        <button class="sc-ib" data-act="view-cfg" data-id="${s.id}">${ic('eye')}</button>
+        <button class="sc-ib" data-act="dl-cfgs" data-id="${s.id}">${ic('download')}</button>
+        <button class="sc-ib danger" data-act="del-sub" data-id="${s.id}">${ic('trash')}</button>
+      </div>
+      <div class="sc-name">${esc(s.name)}</div>
+      <div><div class="sc-st" style="--c:${c}"><i></i><span>${esc(lbl)}</span></div>
+        <div class="sc-date">${s.expiresAt ? esc(fmtDate(s.expiresAt)) : esc(t('noExpiry'))}</div></div>
+      <div><div class="sc-cfg">${n} ${esc(t('cfgs'))}</div><div class="sc-chips">${chips}</div></div>
+      ${s.announcement ? `<div class="ann" style="font-size:13px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:8px 10px;border-radius:10px">📢 ${esc(s.announcement)}</div>` : ''}
+      ${s.note ? `<div class="note" style="font-size:13px;color:var(--muted);border-left:2px solid var(--border);padding-left:10px">${esc(s.note)}</div>` : ''}
+      ${isAdmin() ? `<div style="font-size:13px;color:var(--muted)">${esc(t('createdBy'))}: <b style="color:var(--text)">${esc(s.owner)}</b></div>` : ''}
+      <button class="sc-tg ${s.disabled ? '' : 'on'}" data-act="toggle-sub" data-id="${s.id}" aria-label="${esc(s.disabled ? t('enable') : t('disable'))}"><i></i></button>
+      <div class="sc-lim"><div class="lh"><span>Limit${esc(dev)}</span><span>${esc(lim)}</span></div><div class="sc-bar ${s.gbLimit ? '' : 'inf'}"><b style="width:${pct}%"></b></div></div>
+      ${openCfg.has(s.id) ? `<div class="sc-cl">${cfgs.map((x, i) => { const inf = (s.names && s.names[x]) || defaultInfo(x, i); return `<div><small>${esc(PROTO_LABEL[protoOf(x)] || protoOf(x))}</small>${esc(((inf.flag ? inf.flag + ' ' : '') + (inf.name || '')).trim())}</div>`; }).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderGroups() {
+  const list = visibleGroups(), el = $('#groupList');
+  if (!list.length) { el.innerHTML = `<div class="empty" style="grid-column:1/-1">${ic('layers')}<div>${esc(t('emptyGroups'))}</div></div>`; return; }
+  el.innerHTML = list.map(g => {
+    const used = db.subs.filter(s => s.mode === 'groups' && (s.groupIds || []).includes(g.id)).length;
+    return `<div class="card"><div class="card-head"><div><h3>${esc(g.name)}</h3><p>${parseCfg(g.configs).valid.length} configs · ${esc(t('usedBy', { n: used }))}${isAdmin() ? ' · ' + esc(g.owner) : ''}</p></div></div>
+      <div class="actions"><button class="btn sm" data-act="edit-group" data-id="${g.id}">${ic('edit')} ${esc(t('edit'))}</button>
+      <button class="btn sm danger" data-act="del-group" data-id="${g.id}">${ic('trash')}</button></div></div>`;
+  }).join('');
+}
+
+function renderOwner() {
+  const subs = visibleSubs();
+  $('#o_stats').innerHTML =
+    statCard('#fbbf24', t('totalUsers'), visibleUsers().length) +
+    statCard('#3b82f6', t('allSystemSubs'), subs.length) +
+    statCard('#a855f7', t('totalConfigs'), subs.reduce((n, s) => n + subConfigs(s).length, 0)) +
+    statCard('#ef4444', t('expiredSubs'), subs.filter(s => statusOf(s) === 'expired').length);
+  $('#o_users').innerHTML = visibleUsers().length ? visibleUsers().map(u => {
+    const n = db.subs.filter(s => s.owner === u.username).length;
+    const isAdm = false, locked = false;
+    const tag = u.protected ? `<span class="chip">${ic('key')} ${esc(t('hiddenFromAdmins'))}</span>` : '';
+    const controls = locked
+      ? `<span class="chip">${ic('key')} ${esc(t('lockedAdmin'))}</span>`
+      : 
+        `<button class="btn sm" data-act="set-limit" data-id="${u.id}">${ic('layers')} ${esc(t('setLimit'))}</button>` +
+        `<button class="btn sm" data-act="reset-user" data-id="${u.id}">${ic('key')} ${esc(t('resetPass'))}</button>
+      <button class="btn sm" data-act="toggle-user" data-id="${u.id}">${ic('power')}</button>
+      <button class="btn sm danger" data-act="del-user" data-id="${u.id}">${ic('trash')}</button>`;
+    return `<div class="list-item"><div class="avatar">${esc(u.username[0])}</div><div class="grow"><b>${esc(u.username)}</b><small>${isAdm ? esc(t('roleAdminOpt')) : esc(t('roleUser'))} · ${n}${u.subLimit > 0 ? '/' + u.subLimit : ''} ${esc(t('navSubs').toLowerCase())} · ${u.disabled ? esc(t('st_userOff')) : esc(t('st_active'))}</small></div>
+      ${tag}${controls}</div>`;
+  }).join('') : `<div class="hint">${esc(t('noUsers'))}</div>`;
+  const bl = $('#o_bulkList');
+  if (bl) {
+    const autos = db.users.filter(x => x.auto), bc = $('#o_bulkCount');
+    if (document.activeElement !== bc && autos.length) bc.value = autos.length;
+    bl.innerHTML = autos.map((u, i) => {
+      const n = db.subs.filter(s => s.owner === u.username).length;
+      return `<div class="list-item"><b>${i + 1}:</b><div class="grow"><b>${esc(u.username)}</b><small>${esc(u.password)} · ${n}${u.subLimit > 0 ? '/' + u.subLimit : ''} ${esc(t('navSubs').toLowerCase())}</small></div>
+        <button class="btn sm" data-act="copy-cred" data-id="${u.id}">${ic('copy')}</button>
+        <button class="btn sm" data-act="set-limit" data-id="${u.id}">${ic('layers')} ${esc(t('setLimit'))}</button></div>`;
+    }).join('');
+  }
+  const a = $('#o_announce'), b = $('#o_baseUrl');
+  if (document.activeElement !== a) a.value = db.announcement;
+  if (document.activeElement !== b) b.value = db.baseUrl;
+}
+
+/* ===================== SHARED VPN CODES & NAMES ===================== */
+const FLAG_RE = /[\u{1F1E6}-\u{1F1FF}]{2}/u, FLAG_RE_G = /[\u{1F1E6}-\u{1F1FF}]{2}/gu;
+const flagOf = cc => String.fromCodePoint(...[...cc.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+const FLAG_CODES = ['DE','US','GB','NL','FR','TR','RU','SE','FI','CA','JP','SG','HK','KR','AE','IN','BR','AU','CH','IT','ES','PL','UA','KZ','TM','IR','IL','NO','DK','AT','BE','IE','CZ','RO','BG','GR','PT','LT','LV','EE','MD','RS','HU','AZ','AM','GE','SA','QA','EG','ZA','MY','TH','VN','ID','PH','TW','CN','AR','MX','CL','LU','IS','UZ','KG','PK'];
+const FLAG_GUESS = [['DE', /germany|deutsch|almanya|frankfurt|berlin/i], ['US', /\busa?\b|united states|america|new york|los angeles/i], ['GB', /\buk\b|united kingdom|britain|england|london/i], ['NL', /nether|holland|amsterdam/i], ['FR', /france|paris/i], ['TR', /turkey|türkiye|turkiye|istanbul|ankara/i], ['RU', /russia|moscow/i], ['SE', /sweden|stockholm/i], ['FI', /finland|helsinki/i], ['CA', /canada|toronto/i], ['JP', /japan|tokyo/i], ['SG', /singapore/i], ['HK', /hong ?kong/i], ['KR', /korea|seoul/i], ['AE', /emirates|dubai|\buae\b/i], ['IN', /india|mumbai/i], ['CH', /switzerland|zurich/i], ['IT', /italy|milan/i], ['ES', /spain|madrid/i], ['PL', /poland|warsaw/i], ['UA', /ukrain|kyiv/i], ['KZ', /kazakh/i]];
+const guessFlag = name => { for (const [cc, re] of FLAG_GUESS) if (re.test(name)) return flagOf(cc); return ''; };
+function remarkOf(code) {
+  try {
+    if (/^vmess:\/\//i.test(code)) {
+      const b = code.slice(8).split('#')[0].replace(/-/g, '+').replace(/_/g, '/');
+      const j = JSON.parse(decodeURIComponent(escape(atob(b))));
+      if (j && j.ps) return String(j.ps);
+    }
+  } catch (e) {}
+  const i = code.indexOf('#');
+  if (i > -1) { try { return decodeURIComponent(code.slice(i + 1)); } catch (e) { return code.slice(i + 1); } }
+  return '';
+}
+// moves any flag emoji typed inside the name to the beginning (stored separately)
+function splitName(raw, keepFlag) {
+  const str = String(raw || ''), m = str.match(FLAG_RE);
+  const name = str.replace(FLAG_RE_G, '').replace(/\s+/g, ' ').trim();
+  return { name, flag: m ? m[0] : (keepFlag !== undefined ? keepFlag : guessFlag(name)) };
+}
+function defaultInfo(code, idx) {
+  const sh = db.shared.find(x => x.code === code);
+  if (sh) return { name: sh.name, flag: sh.flag };
+  const sp = splitName(remarkOf(code));
+  return { name: sp.name || ('Config ' + (idx + 1)), flag: sp.flag };
+}
+function codeRow(i, info, scope, key, tailHtml) {
+  return `<div class="code-row"><span class="code-n">${i + 1}</span><span class="code-flag ${info.flag ? '' : 'dim'}">${info.flag || '🏳️'}</span>` +
+    `<input class="code-name" data-scope="${scope}" data-key="${esc(key)}" value="${esc(info.name)}" spellcheck="false" maxlength="60">` +
+    `<button type="button" class="flag-btn" data-act="pick-flag" data-scope="${scope}" data-key="${esc(key)}">🏳️</button>${tailHtml}</div>`;
+}
+let formNames = {}, rowCodes = [], flagTarget = null;
+function formCodeList() {
+  const shared = db.shared.map(x => x.code);
+  const extras = extraConfigs({ mode: curMode, configs: $('#f_configs').value, groupIds: $$('#groupPick input:checked').map(i => i.value) }).filter(c => !shared.includes(c));
+  return [...shared.map(c => ({ code: c, tag: t('tagManual') })), ...extras.map(c => ({ code: c, tag: curMode === 'groups' ? t('tagGroup') : t('tagManual') }))];
+}
+const formInfo = (code, idx) => formNames[code] || defaultInfo(code, idx);
+function renderCodeRows() {
+  const list = formCodeList(); rowCodes = list.map(x => x.code);
+  $('#codeNamesField').hidden = !list.length;
+  const box = $('#codeList'), top = box.scrollTop;
+  box.innerHTML = list.map((x, i) => codeRow(i, formInfo(x.code, i), 'form', i, `<span class="tag-manual">${esc(x.tag)}</span>`)).join('');
+  box.scrollTop = top;
+}
+function renderKeys() {
+  $('#k_title').textContent = t('sharedCodes', { n: db.shared.length });
+  $('#keysList').innerHTML = db.shared.length ? db.shared.map((x, i) => codeRow(i, x, 'shared', x.id,
+    `<button type="button" class="btn sm" data-act="copy-shared" data-id="${x.id}" title="${esc(t('copyCode'))}">${ic('copy')}</button><button type="button" class="btn sm danger" data-act="del-shared" data-id="${x.id}">${ic('trash')}</button>`)).join('') : '';
+}
+function addShared(text) {
+  const have = new Set(db.shared.map(x => x.code)); let added = 0;
+  parseCfg(text).valid.forEach(code => {
+    if (have.has(code)) return;
+    const sp = splitName(remarkOf(code));
+    db.shared.push({ id: rid(8), code, name: sp.name || ('Server ' + (db.shared.length + 1)), flag: sp.flag });
+    have.add(code); added++;
+  });
+  save(); return added;
+}
+function onNameEdit(el, commit) {
+  const scope = el.dataset.scope, key = el.dataset.key;
+  let cur, setVal;
+  if (scope === 'form') {
+    const code = rowCodes[+key]; if (!code) return;
+    cur = formInfo(code, +key);
+    setVal = v => { formNames[code] = v; };
+    if (!commit) return setVal({ name: el.value, flag: cur.flag });
+    const sp = splitName(el.value, cur.flag); if (!sp.name) sp.name = defaultInfo(code, +key).name;
+    setVal(sp); el.value = sp.name;
+  } else {
+    const x = db.shared.find(y => y.id === key); if (!x) return;
+    if (!commit) { x.name = el.value; return; }
+    const sp = splitName(el.value, x.flag); x.name = sp.name || x.name; x.flag = sp.flag; el.value = x.name; save();
+  }
+  const flagEl = el.previousElementSibling, f = (scope === 'form' ? formNames[rowCodes[+key]].flag : db.shared.find(y => y.id === key).flag);
+  flagEl.textContent = f || '🏳️'; flagEl.classList.toggle('dim', !f);
+}
+function openFlag(scope, key) {
+  flagTarget = { scope, key };
+  $('#flagGrid').innerHTML = FLAG_CODES.map(cc => `<button type="button" class="flag-opt" data-act="set-flag" data-flag="${flagOf(cc)}">${flagOf(cc)}</button>`).join('') +
+    `<button type="button" class="flag-opt none" data-act="set-flag" data-flag="">🏳️ ${esc(t('noFlag'))}</button>`;
+  $('#flagModal').classList.add('show');
+}
+const closeFlag = () => $('#flagModal').classList.remove('show');
+function applyFlag(flag) {
+  if (!flagTarget) return;
+  const { scope, key } = flagTarget;
+  if (scope === 'form') { const code = rowCodes[+key]; if (code) formNames[code] = { name: formInfo(code, +key).name, flag }; renderCodeRows(); }
+  else { const x = db.shared.find(y => y.id === key); if (x) { x.flag = flag; save(); renderKeys(); } }
+  closeFlag(); flagTarget = null;
+}
+
+/* ===================== SUBSCRIPTION MODAL ===================== */
+let editingId = null, curMode = 'manual', editingGroupId = null;
+const openModal = id => $(id).classList.add('show');
+const closeModals = () => $$('.modal').forEach(m => m.classList.remove('show'));
+function setMode(m) {
+  curMode = m;
+  $$('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  $('#modeManual').hidden = m !== 'manual'; $('#modeGroups').hidden = m !== 'groups';
+  updateCfgStats();
+}
+function renderGroupPick(selected = []) {
+  const gs = visibleGroups();
+  $('#groupPick').innerHTML = gs.length ? gs.map(g => `<label><input type="checkbox" value="${g.id}" ${selected.includes(g.id) ? 'checked' : ''}><span>${esc(g.name)}</span><small>${parseCfg(g.configs).valid.length} configs</small></label>`).join('')
+    : `<div class="hint">${esc(t('noGroups'))} <a href="#" data-act="nav" data-id="groups" style="color:inherit;text-decoration:underline">${esc(t('goGroups'))}</a></div>`;
+}
+function chipsFor(valid, invalid) {
+  return `<span class="chip ok">${esc(t('valid', { n: valid }))}</span>` + (invalid ? `<span class="chip bad">${esc(t('invalid', { n: invalid }))}</span>` : '');
+}
+function updateCfgStats() {
+  if (curMode === 'manual') {
+    const r = parseCfg($('#f_configs').value);
+    const counts = {}; r.valid.forEach(l => { const p = l.split(':')[0].toLowerCase().replace('hy2', 'hysteria2'); counts[p] = (counts[p] || 0) + 1; });
+    $('#cfgStats').innerHTML = chipsFor(r.valid.length, r.invalid.length) + Object.entries(counts).map(([p, n]) => `<span class="chip">${p} ${n}</span>`).join('');
+  } else {
+    const ids = $$('#groupPick input:checked').map(i => i.value);
+    $('#cfgStats').innerHTML = chipsFor(extraConfigs({ mode: 'groups', groupIds: ids }).length, 0);
+  }
+  renderCodeRows();
+}
+function syncGbCustom() { $('#f_gb_custom').hidden = $('#f_gb').value !== 'custom'; }
+/* ---- per-user subscription quota (0 / empty = unlimited, owner is never limited) ---- */
+const subQuota = () => { if (!session || isOwnerRole()) return 0; const u = db.users.find(x => x.username === session.user); return u && u.subLimit > 0 ? +u.subLimit : 0; };
+const quotaFull = () => { const q = subQuota(); return q > 0 && db.subs.filter(s => s.owner === session.user).length >= q; };
+function openSubModal(id) {
+  editingId = id || null;
+  const s = id ? db.subs.find(x => x.id === id) : null;
+  $('#formErr').hidden = true;
+  $('#subModalTitle').textContent = s ? t('editSub') : t('createSub');
+  $('#saveSubBtn').textContent = s ? t('saveChanges') : t('saveSub');
+  fillSelects();
+  $('#f_name').value = s ? s.name : ''; $('#f_title').value = s ? s.title : '';
+  $('#f_web').value = s ? s.web : ''; $('#f_support').value = s ? s.support : '';
+  const gb = s ? +s.gbLimit || 0 : 0;
+  if ([...$('#f_gb').options].some(o => o.value === String(gb))) { $('#f_gb').value = String(gb); $('#f_gb_custom').value = ''; }
+  else { $('#f_gb').value = 'custom'; $('#f_gb_custom').value = gb; }
+  syncGbCustom();
+  $('#f_limit').value = s ? String(s.limit || 0) : '0';
+  $('#f_duration').value = s ? 'keep' : '30';
+  $('#f_interval').value = s ? String(s.interval) : '1';
+  $('#f_announce').value = s ? s.announcement : ''; $('#f_note').value = s ? s.note : '';
+  $('#f_configs').value = s && s.mode === 'manual' ? s.configs : '';
+  formNames = s && s.names ? JSON.parse(JSON.stringify(s.names)) : {};
+  renderGroupPick(s && s.mode === 'groups' ? s.groupIds : []);
+  setMode(s ? s.mode : 'manual');
+  openModal('#subModal'); $('.sheet', $('#subModal')).scrollTop = 0;
+}
+function formErr(msg) { const e = $('#formErr'); e.textContent = msg; e.hidden = false; e.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+function saveSub() {
+  const name = $('#f_name').value.trim(), web = $('#f_web').value.trim(), support = $('#f_support').value.trim();
+  if (!editingId && quotaFull()) return formErr(t('errSubLimit', { n: subQuota() }));
+  if (!/^[\w-]{2,40}$/.test(name)) return formErr(t('errName'));
+  if (db.subs.some(s => s.name.toLowerCase() === name.toLowerCase() && s.id !== editingId)) return formErr(t('errNameDup'));
+  if (!okUrl(web) || !okUrl(support)) return formErr(t('errUrl'));
+  let gbLimit = 0;
+  if ($('#f_gb').value === 'custom') { gbLimit = parseFloat($('#f_gb_custom').value); if (!(gbLimit > 0 && gbLimit <= 100000)) return formErr(t('errGb')); }
+  else gbLimit = +$('#f_gb').value;
+  const groupIds = $$('#groupPick input:checked').map(i => i.value), configs = $('#f_configs').value;
+  if (!subConfigs({ mode: curMode, configs, groupIds }).length) return formErr(t('errConfigs'));
+  const names = {};
+  rowCodes.forEach((c, i) => { if (formNames[c]) { const sp = splitName(formNames[c].name, formNames[c].flag); names[c] = { name: sp.name || defaultInfo(c, i).name, flag: sp.flag }; } });
+  const data = { names, name, title: $('#f_title').value.trim(), web, support, gbLimit, limit: +$('#f_limit').value, interval: +$('#f_interval').value,
+    announcement: $('#f_announce').value.trim(), note: $('#f_note').value.trim(), mode: curMode, configs, groupIds };
+  const dur = $('#f_duration').value;
+  if (editingId) {
+    const s = db.subs.find(x => x.id === editingId); Object.assign(s, data);
+    if (dur !== 'keep') { s.durationDays = +dur; s.expiresAt = +dur ? Date.now() + +dur * DAY : 0; }
+  } else {
+    db.subs.unshift({ id: rid(8), token: newToken(), owner: session.user, createdAt: Date.now(), durationDays: +dur, expiresAt: +dur ? Date.now() + +dur * DAY : 0, disabled: false, ...data });
+  }
+  save(); closeModals(); toast(t('saved')); renderAll();
+}
+
+/* ===================== GROUP MODAL ===================== */
+function openGroupModal(id) {
+  editingGroupId = id || null;
+  const g = id ? db.groups.find(x => x.id === id) : null;
+  $('#groupErr').hidden = true;
+  $('#groupModalTitle').textContent = g ? t('editGroup') : t('newGroup');
+  $('#g_name').value = g ? g.name : ''; $('#g_configs').value = g ? g.configs : '';
+  updateGroupStats(); openModal('#groupModal');
+}
+function updateGroupStats() { const r = parseCfg($('#g_configs').value); $('#gCfgStats').innerHTML = chipsFor(r.valid.length, r.invalid.length); }
+function saveGroup() {
+  const name = $('#g_name').value.trim(), configs = $('#g_configs').value;
+  if (!name || !parseCfg(configs).valid.length) { const e = $('#groupErr'); e.textContent = t('errGroup'); e.hidden = false; return; }
+  if (editingGroupId) { Object.assign(db.groups.find(x => x.id === editingGroupId), { name, configs }); }
+  else { db.groups.unshift({ id: rid(8), owner: session.user, name, configs }); }
+  save(); closeModals(); toast(t('saved')); renderAll();
+}
+
+/* ===================== EVENTS ===================== */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  if (el.tagName === 'A') e.preventDefault();
+  switch (act) {
+    case 'lang': lang = lang === 'en' ? 'tr' : 'en'; try { localStorage.setItem('reaper:lang', lang); } catch (_) {} applyI18n(); break;
+    case 'theme': theme = theme === 'system' ? 'dark' : theme === 'dark' ? 'light' : 'system'; try { localStorage.setItem('reaper:theme', theme); } catch (_) {} applyTheme(); break;
+    case 'menu': openMenu(); break;
+    case 'logout': logout(); break;
+    case 'nav': closeModals(); showPage(id); break;
+    case 'close-modal': closeModals(); break;
+    case 'close-flag': closeFlag(); break;
+    case 'open-keys': if (!isOwnerRole()) return; renderKeys(); openModal('#keysModal'); break;
+    case 'add-codes': {
+      if (!isOwnerRole()) return;
+      const n = addShared($('#k_codes').value);
+      if (n) { $('#k_codes').value = ''; toast(t('codesAdded', { n })); renderKeys(); renderAll(); } else toast(t('codesNone'));
+      break;
+    }
+    case 'del-shared': if (isOwnerRole() && confirm(t('confirmDel'))) { db.shared = db.shared.filter(x => x.id !== id); save(); renderKeys(); renderAll(); } break;
+    case 'copy-shared': { if (!isOwnerRole()) return; const x = db.shared.find(y => y.id === id); if (x) copyText(x.code); break; }
+    case 'pick-flag': if (el.dataset.scope === 'shared' && !isOwnerRole()) return; openFlag(el.dataset.scope, el.dataset.key); break;
+    case 'set-flag': applyFlag(el.dataset.flag); break;
+    case 'new-sub': if (quotaFull()) return toast(t('errSubLimit', { n: subQuota() })); openSubModal(); break;
+    case 'edit-sub': openSubModal(id); break;
+    case 'save-sub': saveSub(); break;
+    case 'toggle-all': el.classList.toggle('open'); $('#allLinks').hidden = !el.classList.contains('open'); break;
+    case 'search-open': { const b = $('#searchBox'); if (!b.classList.contains('open')) { b.classList.add('open'); $('#searchInput').focus(); } break; }
+    case 'refresh': renderAll(); toast(t('updated')); break;
+    case 'copy-link': { const s = db.subs.find(x => x.id === id); if (s) copyText(subLink(s)); break; }
+    case 'copy-cfgs': { const s = db.subs.find(x => x.id === id); if (s) copyText(subConfigs(s).join('\n')); break; }
+    case 'copy-sub-desc': { const s = db.subs.find(x => x.id === id); if (s) { const subData = { name: s.name || 'ReapLine', description: 'ReapLine', token: s.token, url: subLink(s) }; copyText(JSON.stringify(subData, null, 2)); } break; }
+    case 'share-sub': { const s = db.subs.find(x => x.id === id); if (!s) break; if (navigator.share) navigator.share({ title: s.name, url: subLink(s) }).catch(() => {}); else copyText(subLink(s)); break; }
+    case 'view-cfg': { openCfg.has(id) ? openCfg.delete(id) : openCfg.add(id); renderAll(); break; }
+    case 'dl-cfgs': { const s = db.subs.find(x => x.id === id); if (!s) break; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([subConfigs(s).join('\n')], { type: 'text/plain' })); a.download = (s.name || 'configs') + '.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); break; }
+    case 'copy-all': copyText(visibleSubs().map(subLink).join('\n')); break;
+    case 'toggle-sub': { const s = db.subs.find(x => x.id === id); s.disabled = !s.disabled; save(); renderAll(); break; }
+    case 'del-sub': if (confirm(t('confirmDel'))) { const s = db.subs.find(x => x.id === id); if (s) db.deleted = [...new Set([...(db.deleted || []), s.token, s.legacyToken].filter(Boolean))]; db.subs = db.subs.filter(x => x.id !== id); save(); renderAll(); } break;
+    case 'new-group': openGroupModal(); break;
+    case 'edit-group': openGroupModal(id); break;
+    case 'save-group': saveGroup(); break;
+    case 'del-group': if (confirm(t('confirmDel'))) { const g = db.groups.find(x => x.id === id); db.groups = db.groups.filter(x => x.id !== id); save(); renderAll(); } break;
+    /* ---- owner only (guarded again) ---- */
+    case 'add-user': {
+      if (!isAdmin()) return;
+      const u = $('#o_newUser').value.trim(), p = $('#o_newPass').value;
+      if (!u || !p || u.toLowerCase() === ADMIN_USER || db.users.some(x => x.username.toLowerCase() === u.toLowerCase())) return toast(t('errUser'));
+      db.users.push({ id: rid(8), username: u, password: p, role: 'user', disabled: false, subLimit: Math.max(0, Math.min(100000, parseInt($('#o_newLimit').value) || 0)) }); save();
+      $('#o_newUser').value = ''; $('#o_newPass').value = ''; toast(t('userAdded')); renderAll(); break;
+    }
+    case 'toggle-role': { return;  if (!isOwnerRole()) return; const u = db.users.find(x => x.id === id); if (!u || u.auto) return; if (u.username === session.user) return toast(t('errSelf')); u.role = u.role === 'admin' ? 'user' : 'admin'; save(); renderAll(); break; }
+    case 'toggle-user': { if (!isAdmin()) return; const u = db.users.find(x => x.id === id); if (!u || ((u.role === 'admin' || u.protected) && !isOwnerRole())) return; if (u.username === session.user) return toast(t('errSelf')); u.disabled = !u.disabled; save(); renderAll(); break; }
+    case 'reset-user': { if (!isAdmin()) return; const u = db.users.find(x => x.id === id); if (!u || ((u.role === 'admin' || u.protected) && !isOwnerRole())) return; const p = prompt(t('newPassPrompt', { u: u.username })); if (p) { u.password = p; save(); toast(t('saved')); } break; }
+    case 'del-user': if (!isAdmin() || ((db.users.find(x => x.id === id)?.role === 'admin' || db.users.find(x => x.id === id)?.protected) && !isOwnerRole())) { /* admins cannot touch admins */ } else if (db.users.find(x => x.id === id)?.username === session.user) { toast(t('errSelf')); } else if (confirm(t('confirmDel'))) { const u = db.users.find(x => x.id === id); db.users = db.users.filter(x => x.id !== id); save(); renderAll(); } break;
+    case 'save-settings': { if (!isAdmin()) return; db.announcement = $('#o_announce').value.trim(); db.baseUrl = $('#o_baseUrl').value.trim() || defaultBase(); const sk = $('#o_syncKey'); if (isOwnerRole() && sk && sk.value.trim()) { try { localStorage.setItem(SYNC_KEY_LS, sk.value.trim()); } catch (e) {} sk.value = ''; }
+      save(); toast(t('saved')); if (isOwnerRole()) pushSync(true); renderAll(); break; }
+    case 'export': {
+      if (!isOwnerRole()) return;
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' }));
+      a.download = 'reaper-backup-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); break;
+    }
+    case 'sync-now': {
+      if (!isOwnerRole()) return;
+      const sk = $('#o_syncKey'); if (sk && sk.value.trim()) { try { localStorage.setItem(SYNC_KEY_LS, sk.value.trim()); } catch (e) {} sk.value = ''; }
+      if (!getSyncKey()) return toast(t('syncNoKey'));
+      pushSync(true).then(r => toast(r.ok ? t('syncOk', { n: r.n }) : t('syncFail', { e: r.error || '' }))); break;
+    }
+    case 'set-limit': {
+      if (!isAdmin()) return;
+      const u = db.users.find(x => x.id === id); if (!u || ((u.role === 'admin' || u.protected) && !isOwnerRole())) return;
+      const v = prompt(t('limitPrompt', { u: u.username }), u.subLimit || 0); if (v === null) return;
+      const n = parseInt(v); if (isNaN(n) || n < 0) return;
+      u.subLimit = Math.min(n, 100000); save(); toast(t('limitSaved')); renderAll(); break;
+    }
+    case 'copy-cred': { if (!isOwnerRole()) return; const u = db.users.find(x => x.id === id); if (u) copyText(u.username + '\n' + u.password); break; }
+    case 'bulk-apply': {
+      if (!isOwnerRole()) return;
+      const want = Math.max(0, Math.min(100, parseInt($('#o_bulkCount').value) || 0)), lim = Math.max(0, Math.min(100000, parseInt($('#o_bulkLimit').value) || 0));
+      const autos = db.users.filter(x => x.auto);
+      if (want < autos.length) {
+        if (!confirm(t('bulkShrink', { n: autos.length - want }))) return;
+        const drop = new Set(autos.slice(want).map(x => x.id)); db.users = db.users.filter(x => !drop.has(x.id));
+      } else {
+        for (let i = autos.length; i < want; i++) {
+          let name; do { name = 'user-' + (1000 + Math.floor(Math.random() * 9000)); } while (db.users.some(x => x.username.toLowerCase() === name));
+          db.users.push({ id: rid(8), username: name, password: rid(8), role: 'user', disabled: false, protected: true, auto: true, subLimit: lim });
+        }
+      }
+      save(); toast(t('bulkDone')); renderAll(); break;
+    }
+    case 'copy-users': {
+      if (!isOwnerRole()) return;
+      const list = db.users.filter(u => u.username !== SPECIAL.username).map(u => ({ username: u.username, password: u.password, role: 'user', limit: u.subLimit || 0, ...(u.auto ? { hidden: true } : {}) }));
+      copyText('const SEED_USERS = ' + JSON.stringify(list) + ';'); break;
+    }
+    case 'import': if (isOwnerRole()) $('#o_file').click(); break;
+    case 'wipe': if (isOwnerRole() && confirm(t('confirmWipe'))) { const dl = [...new Set([...(db.deleted || []), ...db.subs.flatMap(x => [x.token, x.legacyToken].filter(Boolean))])]; db = blank(); db.deleted = dl; ensureSpecial(); renderAll(); } break;
+  }
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'o_file' && isOwnerRole()) {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { try { const d = JSON.parse(r.result); if (!Array.isArray(d.subs)) throw 0; const dl = db.deleted || []; db = Object.assign(blank(), d); db.deleted = [...new Set([...dl, ...(d.deleted || [])])].filter(tk => !db.subs.some(x => x.token === tk || x.legacyToken === tk)); ensureSpecial(); toast(t('importOk')); renderAll(); } catch (_) { toast(t('importBad')); } e.target.value = ''; };
+    r.readAsText(f);
+  }
+  if (e.target.matches('#groupPick input')) updateCfgStats();
+  if (e.target.id === 'statusFilter') renderSubs();
+  if (e.target.id === 'f_gb') { syncGbCustom(); if (e.target.value === 'custom') $('#f_gb_custom').focus(); }
+});
+document.addEventListener('focusin', e => { if (e.target.classList && e.target.classList.contains('code-name')) setTimeout(() => e.target.select(), 0); });
+document.addEventListener('change', e => { if (e.target.classList && e.target.classList.contains('code-name')) onNameEdit(e.target, true); });
+document.addEventListener('input', e => {
+  if (e.target.classList && e.target.classList.contains('code-name')) onNameEdit(e.target, false);
+  if (e.target.id === 'f_configs') updateCfgStats();
+  if (e.target.id === 'g_configs') updateGroupStats();
+  if (e.target.id === 'searchInput') renderSubs();
+});
+$('#searchInput').addEventListener('blur', () => { if (!$('#searchInput').value) $('#searchBox').classList.remove('open'); });
+$('#modeSeg').addEventListener('click', e => { const b = e.target.closest('button[data-mode]'); if (b) setMode(b.dataset.mode); });
+$('#overlay').addEventListener('click', closeMenu);
+$$('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m) (m.id === 'flagModal' ? closeFlag() : closeModals()); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#flagModal').classList.contains('show')) return closeFlag(); closeModals(); closeMenu(); } });
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => theme === 'system' && applyTheme());
+setInterval(() => { if (session && !document.querySelector('.modal.show') && document.activeElement.tagName !== 'INPUT') renderAll(); }, 60000);
+
+/* ===================== INIT ===================== */
+paintIcons(); applyI18n(); applyTheme();
+try {
+  const s = JSON.parse(sessionStorage.getItem(SKEY) || 'null');
+  const okUser = s && s.role === 'user' && db.users.some(u => u.username === s.user && !u.disabled);
+  if (s && s.user && (s.role === 'owner' || okUser)) startSession(s, true);
+} catch (e) {}
+</script>
+</body>
+</html>
